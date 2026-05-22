@@ -26,6 +26,9 @@ function ScanFlow() {
           <HandPicker
             onSelect={(h) => {
               setHand(h);
+              try {
+                sessionStorage.setItem("hasta:hand", h);
+              } catch {}
               setStep("scan");
             }}
           />
