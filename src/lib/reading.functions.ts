@@ -4,6 +4,8 @@ import shastraText from "./knowledge/hasta-samudrika-shastra.txt?raw";
 type ReadingInput = {
   hand: "left" | "right";
   question?: string;
+  /** Optional data URL (data:image/jpeg;base64,...) of the seeker's palm photo. */
+  imageDataUrl?: string;
 };
 
 type Section = { title: string; body: string };
@@ -46,13 +48,28 @@ export const generateReading = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
 
-    const userPrompt = `Generate a complete destiny reading for the seeker's ${data.hand} palm (${data.hand === "right" ? "active/forging destiny" : "innate/karmic blueprint"}).${data.question ? ` They ask: "${data.question}"` : ""}
+    const hasImage = typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
+
+    const userText = `Generate a complete destiny reading for the seeker's ${data.hand} palm (${data.hand === "right" ? "active/forging destiny" : "innate/karmic blueprint"}).${data.question ? ` They ask: "${data.question}"` : ""}
+
+${hasImage
+  ? `An actual photograph of the seeker's ${data.hand} palm is attached. STUDY IT CAREFULLY before writing. Observe:
+- Which mounts are raised, flat, or cross-marked (Guru, Shani, Surya, Budha, Mangal upper/lower, Chandra, Shukra).
+- The Jeevan/Ayu Rekha — its arc, length, breaks, islands, chains, sister-line.
+- The Mastaka Rekha — straight or sloping, length, forks at the end.
+- The Hridaya Rekha — origin, curve, branches, depth.
+- The Bhagya Rekha — present or absent, where it begins (Chandra, wrist, life line) and where it ends.
+- The Surya Rekha, Vivah Rekha(s), Santan Rekha(s), Swasthya/Mangal lines if visible.
+- Any auspicious signs (trishul, swastika, machhli, kamal, chakra, yav, dhwaja) or doshas (cross, island, grid, dot, break) and on WHICH mount/rekha they fall.
+- Finger lengths, phalange proportions, thumb shape, nail shape.
+Tie every reading point back to what you actually SEE in this specific palm and what the shastra says about that observation. Do NOT invent signs that are not visible.`
+  : `No palm photograph was provided. Compose a general but shastra-grounded reading for the ${data.hand} hand, and gently note in the summary that a clearer photograph would sharpen the reading.`}
 
 Return ONLY valid JSON matching this exact shape (no markdown, no prose):
 {
   "scores": { "destiny": <1-10 number>, "wealth": <1-10>, "love": <1-10>, "karma": <1-10> },
   "free": [
-    { "title": "<mount or rekha name in Sanskrit, e.g. 'The Mount of Jupiter'>", "body": "<3-5 sentence cinematic reading rooted in the shastra>" },
+    { "title": "<mount or rekha name in Sanskrit, e.g. 'The Mount of Jupiter'>", "body": "<3-5 sentence cinematic reading rooted in the shastra AND what you see in the photo>" },
     { "title": "...", "body": "..." }
   ],
   "premium": [
@@ -68,6 +85,13 @@ Return ONLY valid JSON matching this exact shape (no markdown, no prose):
 
 Give exactly 2 free sections and exactly 6 premium sections. Make scores reflect the reading's narrative (not random).`;
 
+    const userContent: unknown = hasImage
+      ? [
+          { type: "text", text: userText },
+          { type: "image_url", image_url: { url: data.imageDataUrl } },
+        ]
+      : userText;
+
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -75,12 +99,11 @@ Give exactly 2 free sections and exactly 6 premium sections. Make scores reflect
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // gemini-2.5-pro handles the full ~33k-token shastra corpus in-context
-        // and reasons over it with master-level precision.
+        // gemini-2.5-pro: long context for the full shastra + multimodal vision for the palm photo.
         model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userPrompt },
+          { role: "user", content: userContent },
         ],
         response_format: { type: "json_object" },
       }),
