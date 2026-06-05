@@ -72,7 +72,7 @@ function HandPicker({ onSelect }: { onSelect: (h: "left" | "right") => void }) {
 }
 
 /** Compress an image source to a JPEG data URL ≤ ~900px on the long edge. */
-async function compressToDataUrl(src: Blob | string, maxDim = 900, quality = 0.82): Promise<string> {
+async function compressToDataUrl(src: Blob | string, maxDim = 1280, quality = 0.88): Promise<string> {
   const url = typeof src === "string" ? src : URL.createObjectURL(src);
   try {
     const img = await new Promise<HTMLImageElement>((res, rej) => {
