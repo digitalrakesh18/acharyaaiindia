@@ -20,7 +20,16 @@ type Point = { x: number; y: number };
 type LineAnno = { name: string; color: string; points: Point[]; note?: string };
 type MountAnno = { name: string; x: number; y: number; state: "raised" | "flat" | "marked"; note?: string };
 type SignAnno = { name: string; x: number; y: number; meaning?: string };
-type Annotations = { lines: LineAnno[]; mounts: MountAnno[]; signs: SignAnno[] };
+type PalmBox = { x: number; y: number; w: number; h: number };
+type Annotations = {
+  palmDetected: boolean;
+  palmBox: PalmBox;
+  imageQuality: "excellent" | "good" | "poor";
+  notes?: string;
+  lines: LineAnno[];
+  mounts: MountAnno[];
+  signs: SignAnno[];
+};
 type ReadingData = {
   scores: { destiny: number; wealth: number; love: number; karma: number };
   free: Section[];
