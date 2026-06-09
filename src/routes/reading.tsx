@@ -134,52 +134,19 @@ function Reading() {
         </div>
 
         {data && (
-          <section className="relative">
-            <div className="relative rounded-[32px] border border-border bg-card overflow-hidden">
-              <div className="p-12 space-y-6 blur-sm select-none pointer-events-none opacity-60">
-                {data.premium.slice(0, 2).map((p) => (
-                  <div key={p.title} className="space-y-3">
-                    <h2 className="font-serif text-2xl italic text-accent">{p.title}</h2>
-                    <p className="text-lg leading-relaxed text-foreground/80 font-serif">{p.body}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-md p-6">
-                <div className="bg-card border border-accent/40 p-8 md:p-10 rounded-3xl shadow-gold text-center max-w-md w-full space-y-6 animate-[float_6s_ease-in-out_infinite]">
-                  <div className="size-16 bg-accent rounded-full mx-auto flex items-center justify-center shadow-gold">
-                    <span className="text-accent-foreground text-2xl">🔒</span>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="font-serif text-2xl md:text-3xl">Your full reading is ready</h3>
-                    <p className="text-sm text-foreground/60">
-                      87% of seekers find clarity after unlocking their complete Destiny Analysis.
-                    </p>
-                  </div>
-
-                  <ul className="text-left space-y-2 text-sm text-foreground/80">
-                    {data.premium.map((p) => (
-                      <li key={p.title} className="flex items-start gap-2">
-                        <span className="text-accent mt-0.5">✧</span> {p.title}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="space-y-3">
-                    <button className="w-full bg-accent text-accent-foreground py-4 rounded-xl font-bold hover:scale-[1.02] transition-all">
-                      Unlock Full Reading — ₹69
-                    </button>
-                    <button className="w-full border border-accent/40 py-3 rounded-xl text-sm font-bold hover:bg-accent/5 transition-all">
-                      Go Premium ₹299/mo · Unlimited
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-foreground/40 uppercase tracking-widest font-bold">
-                    Secure checkout · Razorpay & Stripe · 7-day refund
-                  </p>
-                </div>
-              </div>
+          <div className="space-y-8">
+            <div className="text-center space-y-2 pt-4">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">The Full Shastra Reading</span>
+              <h2 className="text-3xl md:text-4xl font-serif">Your complete destiny analysis</h2>
+              <p className="text-xs text-foreground/50 uppercase tracking-widest font-mono">Always free · Unlimited readings</p>
             </div>
-          </section>
+            {data.premium.map((p) => (
+              <article key={p.title} className="p-8 rounded-3xl border border-accent/20 bg-card/60">
+                <h2 className="font-serif text-2xl italic text-accent mb-4">{p.title}</h2>
+                <p className="text-lg leading-relaxed text-foreground/85 font-serif">{p.body}</p>
+              </article>
+            ))}
+          </div>
         )}
 
         <div className="text-center pt-8">
