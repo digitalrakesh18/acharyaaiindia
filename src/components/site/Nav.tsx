@@ -13,7 +13,7 @@ export function SiteNav() {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/60">
           <a href="/#shastra" className="hover:text-accent transition-colors">The Shastra</a>
           <a href="/#how" className="hover:text-accent transition-colors">How It Works</a>
-          <a href="/#pricing" className="hover:text-accent transition-colors">Pricing</a>
+          <a href="/#pricing" className="hover:text-accent transition-colors">Free Forever</a>
         </div>
         <div className="flex items-center gap-3">
           <button className="hidden sm:inline text-sm font-medium hover:text-accent">Sign In</button>
