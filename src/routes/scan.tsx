@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteNav } from "@/components/site/Nav";
+import { validatePalm } from "@/lib/reading.functions";
 
 export const Route = createFileRoute("/scan")({
   head: () => ({
