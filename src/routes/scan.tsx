@@ -100,11 +100,13 @@ async function compressToDataUrl(src: Blob | string, maxDim = 1280, quality = 0.
 function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const verify = useServerFn(validatePalm);
   const [mode, setMode] = useState<"camera" | "upload">("camera");
   const [error, setError] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<string>("");
 
   useEffect(() => {
     if (mode !== "camera") return;
@@ -136,18 +138,30 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
 
   const handAndGo = async (dataUrl: string) => {
     setBusy(true);
+    setError(null);
+    setStatus("Verifying your palm…");
     try {
+      const v = await verify({ data: { imageDataUrl: dataUrl } });
+      if (!v.isPalm) {
+        setError(
+          `${v.reason} Please take a clear photo of your open ${hand} palm against a plain background, well-lit, with all five fingers visible.`,
+        );
+        setPreview(null);
+        setBusy(false);
+        setStatus("");
+        return;
+      }
       try {
         sessionStorage.setItem("hasta:palmImage", dataUrl);
       } catch {
-        // Image too large for sessionStorage — recompress smaller and retry once.
         const smaller = await compressToDataUrl(dataUrl, 640, 0.7);
         sessionStorage.setItem("hasta:palmImage", smaller);
       }
       onComplete();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not store the image");
+      setError(e instanceof Error ? e.message : "Could not process the image");
       setBusy(false);
+      setStatus("");
     }
   };
 
