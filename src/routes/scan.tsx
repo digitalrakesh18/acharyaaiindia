@@ -325,49 +325,28 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
   );
 }
 
-const LINES = ["Heart Line", "Head Line", "Life Line", "Fate Line", "Sun Line", "Marriage Line"];
-
 function Analyzing() {
   const navigate = useNavigate();
-  const [detected, setDetected] = useState<string[]>([]);
-
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    LINES.forEach((l, i) => {
-      timers.push(setTimeout(() => setDetected((d) => [...d, l]), 400 + i * 400));
-    });
-    const finish = setTimeout(() => navigate({ to: "/reading" }), 400 + LINES.length * 400 + 800);
-    timers.push(finish);
-    return () => timers.forEach(clearTimeout);
+    const t = setTimeout(() => navigate({ to: "/reading" }), 900);
+    return () => clearTimeout(t);
   }, [navigate]);
 
   return (
-    <div className="py-12 space-y-12">
+    <div className="py-20 flex flex-col items-center justify-center gap-8">
+      <div className="relative size-32">
+        <div className="absolute inset-0 rounded-full border-2 border-accent/20" />
+        <div className="absolute inset-0 rounded-full border-2 border-t-accent border-r-accent/60 border-b-transparent border-l-transparent animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center text-4xl">🪔</div>
+      </div>
       <div className="text-center space-y-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Step 3 of 3</span>
-        <h1 className="text-3xl md:text-5xl font-serif">
+        <h1 className="text-2xl md:text-4xl font-serif">
           The Acharya is reading your <span className="italic text-accent">palm</span>
         </h1>
-        <p className="text-foreground/60">Tracing rekhas, analysing mounts, consulting the Hasta Samudrika…</p>
+        <p className="text-foreground/50 text-xs uppercase tracking-widest font-mono animate-pulse">
+          Consulting the Hasta Samudrika Shastra
+        </p>
       </div>
-
-      <div className="max-w-md mx-auto p-8 rounded-3xl border border-border bg-card shadow-gold-sm space-y-4">
-        {LINES.map((l) => {
-          const ok = detected.includes(l);
-          return (
-            <div key={l} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-              <span className={`font-serif text-lg italic ${ok ? "text-accent" : "text-foreground/40"}`}>{l}</span>
-              <span className={`text-xs font-mono uppercase tracking-widest ${ok ? "text-accent" : "text-foreground/30"}`}>
-                {ok ? "✓ traced" : "..."}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      <p className="text-center text-foreground/40 text-xs uppercase tracking-widest font-mono animate-pulse">
-        Synthesizing destiny narrative
-      </p>
     </div>
   );
 }
