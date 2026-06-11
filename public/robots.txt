@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://hasta-aura-reveal.lovable.app/sitemap.xml
