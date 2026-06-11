@@ -24,6 +24,7 @@ export function QuestionChips() {
         <Link
           key={q}
           to="/scan"
+          aria-label={`Scan your palm to answer: ${q}`}
           className="px-5 py-2.5 rounded-full text-sm bg-white/[0.03] border border-border text-foreground/80 hover:border-accent hover:text-accent transition-all"
         >
           {q}

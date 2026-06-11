@@ -21,7 +21,7 @@ export function SiteNav() {
             to="/scan"
             className="bg-accent text-accent-foreground px-5 py-2 rounded-full text-xs sm:text-sm font-bold hover:scale-105 transition-transform shadow-gold-sm uppercase tracking-wider"
           >
-            Start Reading
+            Scan your palm now
           </Link>
         </div>
       </div>

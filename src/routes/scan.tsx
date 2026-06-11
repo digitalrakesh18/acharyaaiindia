@@ -223,6 +223,8 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
             <button
               key={m}
               onClick={() => { setError(null); setPreview(null); setMode(m); }}
+              aria-label={m === "camera" ? "Use live camera to capture palm" : "Upload an existing palm photo"}
+              aria-pressed={mode === m}
               className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mode === m ? "bg-accent text-accent-foreground shadow-gold-sm" : "text-foreground/60 hover:text-foreground"
               }`}

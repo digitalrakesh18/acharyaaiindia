@@ -153,6 +153,7 @@ function Landing() {
                 <Link
                   to="/scan"
                   key={q}
+                  aria-label={`Scan your palm to explore: ${q}`}
                   className="whitespace-nowrap bg-white/5 border border-border px-4 py-2 rounded-full text-xs hover:border-accent transition-colors"
                 >
                   {q}
