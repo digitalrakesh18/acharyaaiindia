@@ -23,7 +23,7 @@ export function Pricing() {
             to="/scan"
             className="inline-block bg-accent text-accent-foreground px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-gold mt-4"
           >
-            Begin Your Free Reading
+            Get your free AI palm reading
           </Link>
         </div>
       </div>

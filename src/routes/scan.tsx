@@ -7,9 +7,13 @@ import { validatePalm } from "@/lib/reading.functions";
 export const Route = createFileRoute("/scan")({
   head: () => ({
     meta: [
-      { title: "Palm Scan — Hasta AI" },
-      { name: "description", content: "Upload or capture your palm. The Acharya reads it instantly using the full Hasta Samudrika Shastra." },
+      { title: "Scan Your Palm — Free AI Palm Reading | Hasta AI" },
+      { name: "description", content: "Upload or capture your palm. The Acharya reads it instantly using the full Hasta Samudrika Shastra. Free and unlimited." },
+      { property: "og:title", content: "Scan Your Palm — Free AI Palm Reading | Hasta AI" },
+      { property: "og:description", content: "Upload or capture your palm and get an instant AI reading rooted in Hasta Samudrika Shastra." },
+      { property: "og:url", content: "https://hasta-aura-reveal.lovable.app/scan" },
     ],
+    links: [{ rel: "canonical", href: "https://hasta-aura-reveal.lovable.app/scan" }],
   }),
   component: ScanFlow,
 });
@@ -219,6 +223,8 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
             <button
               key={m}
               onClick={() => { setError(null); setPreview(null); setMode(m); }}
+              aria-label={m === "camera" ? "Use live camera to capture palm" : "Upload an existing palm photo"}
+              aria-pressed={mode === m}
               className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
                 mode === m ? "bg-accent text-accent-foreground shadow-gold-sm" : "text-foreground/60 hover:text-foreground"
               }`}
