@@ -454,12 +454,36 @@ function AcharyaChat({
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "acharya",
-      text: "Beta, the rekhas have spoken. What weighs on your heart? Marriage, dhana, career, or the path of dharma — ask, and the shastra shall answer.",
+      text: "Beta, the rekhas have spoken. Share your janm details below so I may weave your Mulank and Bhagyank with the parvats of your hand — then ask what weighs on your heart.",
     },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Birth details (persisted across session)
+  const [name, setName] = useState("");
+  const [dob, setDob] = useState("");
+  const [tob, setTob] = useState("");
+  const [pob, setPob] = useState("");
+  const [gender, setGender] = useState<"" | "male" | "female" | "other">("");
+  const [detailsOpen, setDetailsOpen] = useState(true);
+  const hasDetails = Boolean(dob || name || pob);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("hasta:birth");
+      if (raw) {
+        const b = JSON.parse(raw);
+        setName(b.name ?? "");
+        setDob(b.dob ?? "");
+        setTob(b.tob ?? "");
+        setPob(b.pob ?? "");
+        setGender(b.gender ?? "");
+        if (b.dob) setDetailsOpen(false);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setShowInvite(true), 1500);
@@ -479,6 +503,13 @@ function AcharyaChat({
     return parts.join("\n").slice(0, 4000);
   }, [data]);
 
+  const saveBirth = () => {
+    try {
+      localStorage.setItem("hasta:birth", JSON.stringify({ name, dob, tob, pob, gender }));
+    } catch {}
+    setDetailsOpen(false);
+  };
+
   const send = async (q: string) => {
     const question = q.trim();
     if (!question || busy) return;
@@ -486,7 +517,19 @@ function AcharyaChat({
     setInput("");
     setBusy(true);
     try {
-      const r = await ask({ data: { hand, question, imageDataUrl: imageDataUrl ?? undefined, context } });
+      const r = await ask({
+        data: {
+          hand,
+          question,
+          imageDataUrl: imageDataUrl ?? undefined,
+          context,
+          name: name || undefined,
+          dob: dob || undefined,
+          tob: tob || undefined,
+          pob: pob || undefined,
+          gender: gender || undefined,
+        },
+      });
       setMsgs((m) => [...m, { role: "acharya", text: r.answer }]);
     } catch (e) {
       setMsgs((m) => [
@@ -560,8 +603,68 @@ function AcharyaChat({
               )}
             </div>
 
+            {/* Birth details collapsible */}
+            <div className="border-t border-border bg-background/30">
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((o) => !o)}
+                className="w-full px-5 py-2.5 flex items-center justify-between text-[11px] uppercase tracking-widest font-bold text-accent hover:bg-accent/5"
+              >
+                <span>🕉 Janm Details {hasDetails ? "· Saved" : "· Optional but sharper"}</span>
+                <span>{detailsOpen ? "−" : "+"}</span>
+              </button>
+              {detailsOpen && (
+                <div className="px-5 pb-3 grid grid-cols-2 gap-2">
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Name"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                  />
+                  <input
+                    type="date"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Date of birth"
+                  />
+                  <input
+                    type="time"
+                    value={tob}
+                    onChange={(e) => setTob(e.target.value)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Time of birth"
+                  />
+                  <input
+                    value={pob}
+                    onChange={(e) => setPob(e.target.value)}
+                    placeholder="Place of birth"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                  />
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value as typeof gender)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Gender"
+                  >
+                    <option value="">Gender (optional)</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={saveBirth}
+                    className="bg-accent/20 text-accent border border-accent/40 rounded-lg px-3 py-2 text-xs font-bold hover:bg-accent/30"
+                  >
+                    Save details
+                  </button>
+                </div>
+              )}
+            </div>
+
             {msgs.length <= 1 && (
-              <div className="px-5 pb-2 flex flex-wrap gap-2">
+              <div className="px-5 pt-2 pb-2 flex flex-wrap gap-2">
                 {SUGGESTED.map((s) => (
                   <button
                     key={s}

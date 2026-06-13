@@ -182,6 +182,12 @@ type AskInput = {
   question: string;
   imageDataUrl?: string;
   context?: string;
+  /** Optional birth details for sharper, shastra-grounded predictions. */
+  dob?: string; // "YYYY-MM-DD"
+  tob?: string; // "HH:MM" 24h
+  pob?: string; // place of birth, free text
+  name?: string;
+  gender?: "male" | "female" | "other";
 };
 
 type AskResult = { answer: string };
@@ -195,17 +201,53 @@ CHAT FORMAT RULES (STRICT):
 - 4–8 warm, grounded sentences. Reference the exact mount/rekha/sign from the shastra.
 - Address the seeker as "Beta" or "Putra/Putri" naturally, as a wise elder would.`;
 
+function digitSum(n: number): number {
+  let s = 0;
+  for (const c of String(n)) s += Number(c) || 0;
+  return s;
+}
+function reduceTo1to9(n: number): number {
+  let x = Math.abs(n);
+  while (x > 9) x = digitSum(x);
+  return x || 0;
+}
+function buildBirthBlock(d: AskInput): string {
+  if (!d.dob && !d.tob && !d.pob && !d.name) return "";
+  const parts: string[] = [];
+  if (d.name) parts.push(`Name: ${d.name}`);
+  if (d.gender) parts.push(`Gender: ${d.gender}`);
+  if (d.dob) {
+    const [y, m, day] = d.dob.split("-").map((x) => Number(x));
+    if (y && m && day) {
+      const mulanka = reduceTo1to9(day); // Mulank (psychic number)
+      const bhagyank = reduceTo1to9(digitSum(y) + digitSum(m) + digitSum(day)); // Bhagyank (destiny number)
+      const grahaMap: Record<number, string> = {
+        1: "Surya", 2: "Chandra", 3: "Guru", 4: "Rahu", 5: "Budha",
+        6: "Shukra", 7: "Ketu", 8: "Shani", 9: "Mangal",
+      };
+      parts.push(`Date of Birth: ${d.dob} (Mulank ${mulanka} — ruled by ${grahaMap[mulanka]}; Bhagyank ${bhagyank} — ruled by ${grahaMap[bhagyank]})`);
+    } else {
+      parts.push(`Date of Birth: ${d.dob}`);
+    }
+  }
+  if (d.tob) parts.push(`Time of Birth: ${d.tob}`);
+  if (d.pob) parts.push(`Place of Birth: ${d.pob}`);
+  return `\nSEEKER BIRTH DETAILS (use these to sharpen the prediction; correlate Mulank/Bhagyank ruling graha with the matching parvat and rekha on the palm — e.g. Mulank 3 strengthens Guru Parvat readings, Mulank 5 strengthens Budha, Mulank 6 strengthens Shukra. If birth details and palm disagree, trust the palm but acknowledge the tension):\n${parts.join("\n")}\n`;
+}
+
 export const askAcharya = createServerFn({ method: "POST" })
   .inputValidator((d: AskInput) => d)
   .handler(async ({ data }): Promise<AskResult> => {
     if (!data.question?.trim()) throw new Error("Question is empty");
     const hasImage = typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
 
+    const birthBlock = buildBirthBlock(data);
+
     const userText = `The seeker has already received a reading of their ${data.hand} palm.
-${data.context ? `Earlier reading summary:\n${data.context}\n` : ""}
+${data.context ? `Earlier reading summary:\n${data.context}\n` : ""}${birthBlock}
 They now ask: "${data.question}"
 
-Answer as the Acharya in plain spoken prose only — no markdown, no lists, no JSON, no labels. If the photo is attached, refer to what you actually see on the palm (ignore background). If the shastra is silent, say so plainly and give the closest shastra-grounded guidance.`;
+Answer as the Acharya in plain spoken prose only — no markdown, no lists, no JSON, no labels. Ground EVERY claim in the Hasta Samudrika Shastra text above (cite the relevant parvat/rekha/sign by name). If birth details are present, weave the Mulank/Bhagyank graha into the prediction where the shastra correlates that graha with a mount or rekha. Be SPECIFIC — name the exact mount, rekha, phalange, and timing window (e.g. "between your 28th and 32nd year"). If the photo is attached, refer to what you actually see on the palm (ignore background). If the shastra is silent on a point, say so plainly and give the closest shastra-grounded guidance — never fabricate.`;
 
     const userContent: unknown = hasImage
       ? [
