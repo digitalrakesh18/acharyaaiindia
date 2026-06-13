@@ -454,12 +454,36 @@ function AcharyaChat({
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "acharya",
-      text: "Beta, the rekhas have spoken. What weighs on your heart? Marriage, dhana, career, or the path of dharma — ask, and the shastra shall answer.",
+      text: "Beta, the rekhas have spoken. Share your janm details below so I may weave your Mulank and Bhagyank with the parvats of your hand — then ask what weighs on your heart.",
     },
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Birth details (persisted across session)
+  const [name, setName] = useState("");
+  const [dob, setDob] = useState("");
+  const [tob, setTob] = useState("");
+  const [pob, setPob] = useState("");
+  const [gender, setGender] = useState<"" | "male" | "female" | "other">("");
+  const [detailsOpen, setDetailsOpen] = useState(true);
+  const hasDetails = Boolean(dob || name || pob);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("hasta:birth");
+      if (raw) {
+        const b = JSON.parse(raw);
+        setName(b.name ?? "");
+        setDob(b.dob ?? "");
+        setTob(b.tob ?? "");
+        setPob(b.pob ?? "");
+        setGender(b.gender ?? "");
+        if (b.dob) setDetailsOpen(false);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setShowInvite(true), 1500);
@@ -479,6 +503,13 @@ function AcharyaChat({
     return parts.join("\n").slice(0, 4000);
   }, [data]);
 
+  const saveBirth = () => {
+    try {
+      localStorage.setItem("hasta:birth", JSON.stringify({ name, dob, tob, pob, gender }));
+    } catch {}
+    setDetailsOpen(false);
+  };
+
   const send = async (q: string) => {
     const question = q.trim();
     if (!question || busy) return;
@@ -486,7 +517,19 @@ function AcharyaChat({
     setInput("");
     setBusy(true);
     try {
-      const r = await ask({ data: { hand, question, imageDataUrl: imageDataUrl ?? undefined, context } });
+      const r = await ask({
+        data: {
+          hand,
+          question,
+          imageDataUrl: imageDataUrl ?? undefined,
+          context,
+          name: name || undefined,
+          dob: dob || undefined,
+          tob: tob || undefined,
+          pob: pob || undefined,
+          gender: gender || undefined,
+        },
+      });
       setMsgs((m) => [...m, { role: "acharya", text: r.answer }]);
     } catch (e) {
       setMsgs((m) => [
