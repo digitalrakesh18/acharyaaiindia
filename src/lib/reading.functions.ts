@@ -182,6 +182,12 @@ type AskInput = {
   question: string;
   imageDataUrl?: string;
   context?: string;
+  /** Optional birth details for sharper, shastra-grounded predictions. */
+  dob?: string; // "YYYY-MM-DD"
+  tob?: string; // "HH:MM" 24h
+  pob?: string; // place of birth, free text
+  name?: string;
+  gender?: "male" | "female" | "other";
 };
 
 type AskResult = { answer: string };
