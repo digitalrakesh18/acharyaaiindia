@@ -603,8 +603,68 @@ function AcharyaChat({
               )}
             </div>
 
+            {/* Birth details collapsible */}
+            <div className="border-t border-border bg-background/30">
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((o) => !o)}
+                className="w-full px-5 py-2.5 flex items-center justify-between text-[11px] uppercase tracking-widest font-bold text-accent hover:bg-accent/5"
+              >
+                <span>🕉 Janm Details {hasDetails ? "· Saved" : "· Optional but sharper"}</span>
+                <span>{detailsOpen ? "−" : "+"}</span>
+              </button>
+              {detailsOpen && (
+                <div className="px-5 pb-3 grid grid-cols-2 gap-2">
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Name"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                  />
+                  <input
+                    type="date"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Date of birth"
+                  />
+                  <input
+                    type="time"
+                    value={tob}
+                    onChange={(e) => setTob(e.target.value)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Time of birth"
+                  />
+                  <input
+                    value={pob}
+                    onChange={(e) => setPob(e.target.value)}
+                    placeholder="Place of birth"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                  />
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value as typeof gender)}
+                    className="bg-card border border-border rounded-lg px-3 py-2 text-xs outline-none focus:border-accent"
+                    aria-label="Gender"
+                  >
+                    <option value="">Gender (optional)</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={saveBirth}
+                    className="bg-accent/20 text-accent border border-accent/40 rounded-lg px-3 py-2 text-xs font-bold hover:bg-accent/30"
+                  >
+                    Save details
+                  </button>
+                </div>
+              )}
+            </div>
+
             {msgs.length <= 1 && (
-              <div className="px-5 pb-2 flex flex-wrap gap-2">
+              <div className="px-5 pt-2 pb-2 flex flex-wrap gap-2">
                 {SUGGESTED.map((s) => (
                   <button
                     key={s}
