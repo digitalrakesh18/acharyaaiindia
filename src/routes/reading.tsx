@@ -537,7 +537,9 @@ function AcharyaChat({
         setGender(b.gender ?? "");
         if (b.dob) setDetailsOpen(false);
       }
-    } catch {}
+    } catch {
+      return;
+    }
   }, []);
 
   useEffect(() => {
@@ -575,7 +577,9 @@ function AcharyaChat({
   const saveBirth = () => {
     try {
       localStorage.setItem("hasta:birth", JSON.stringify({ name, dob, tob, pob, gender }));
-    } catch {}
+    } catch {
+      return;
+    }
     setDetailsOpen(false);
   };
 
