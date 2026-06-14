@@ -758,6 +758,34 @@ function AcharyaChat({
               )}
             </div>
 
+            <div className="px-5 pt-2 pb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-foreground/50">
+              <span>Language</span>
+              <div className="flex gap-1">
+                {(["english", "hindi", "telugu"] as const).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => {
+                      setLanguage(l);
+                      try {
+                        localStorage.setItem("hasta:lang", l);
+                      } catch {
+                        /* ignore */
+                      }
+                    }}
+                    className={
+                      "px-2.5 py-1 rounded-full border transition-all " +
+                      (language === l
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-border text-foreground/60 hover:border-accent/60")
+                    }
+                  >
+                    {l === "english" ? "EN" : l === "hindi" ? "हिं" : "తె"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {msgs.length <= 1 && (
               <div className="px-5 pt-2 pb-2 flex flex-wrap gap-2">
                 {SUGGESTED.map((s) => (
