@@ -538,6 +538,8 @@ function AcharyaChat({
         setGender(b.gender ?? "");
         if (b.dob) setDetailsOpen(false);
       }
+      const lang = localStorage.getItem("hasta:lang") as "english" | "hindi" | "telugu" | null;
+      if (lang === "english" || lang === "hindi" || lang === "telugu") setLanguage(lang);
     } catch {
       return;
     }
