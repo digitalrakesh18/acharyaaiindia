@@ -4,7 +4,13 @@ import shastraText from "./knowledge/hasta-samudrika-shastra.txt?raw";
 type Section = { title: string; body: string };
 type Point = { x: number; y: number };
 type LineAnno = { name: string; color: string; points: Point[]; note?: string };
-type MountAnno = { name: string; x: number; y: number; state: "raised" | "flat" | "marked"; note?: string };
+type MountAnno = {
+  name: string;
+  x: number;
+  y: number;
+  state: "raised" | "flat" | "marked";
+  note?: string;
+};
 type SignAnno = { name: string; x: number; y: number; meaning?: string };
 type PalmBox = { x: number; y: number; w: number; h: number };
 type Annotations = {
@@ -153,7 +159,12 @@ function normalizePoints(value: unknown): Point[] {
       const y = clamp01(Number((p as Point)?.y));
       return { x, y };
     })
-    .filter((p, i, arr) => Number.isFinite(p.x) && Number.isFinite(p.y) && (i === 0 || p.x !== arr[i - 1]?.x || p.y !== arr[i - 1]?.y));
+    .filter(
+      (p, i, arr) =>
+        Number.isFinite(p.x) &&
+        Number.isFinite(p.y) &&
+        (i === 0 || p.x !== arr[i - 1]?.x || p.y !== arr[i - 1]?.y),
+    );
 }
 
 function normalizeAnnotations(raw: unknown): Annotations {
@@ -185,7 +196,8 @@ function normalizeAnnotations(raw: unknown): Annotations {
         name: safeText(m?.name, "Mount"),
         x: clamp01(Number(m?.x)),
         y: clamp01(Number(m?.y)),
-        state: m?.state === "raised" || m?.state === "flat" || m?.state === "marked" ? m.state : "flat",
+        state:
+          m?.state === "raised" || m?.state === "flat" || m?.state === "marked" ? m.state : "flat",
         note: safeText(m?.note),
       }))
     : [];
@@ -202,7 +214,10 @@ function normalizeAnnotations(raw: unknown): Annotations {
   return {
     palmDetected,
     palmBox,
-    imageQuality: source.imageQuality === "excellent" || source.imageQuality === "good" ? source.imageQuality : "poor",
+    imageQuality:
+      source.imageQuality === "excellent" || source.imageQuality === "good"
+        ? source.imageQuality
+        : "poor",
     notes: safeText(source.notes, palmDetected ? "Palm detected." : "Palm not clearly detected."),
     observationDigest: safeText(source.observationDigest),
     lines,
@@ -217,20 +232,30 @@ function annotationsToContext(annotations: Annotations) {
     `Image quality: ${annotations.imageQuality}`,
   ];
   if (annotations.notes) parts.push(`Capture note: ${annotations.notes}`);
-  if (annotations.observationDigest) parts.push(`Visible palm summary: ${annotations.observationDigest}`);
+  if (annotations.observationDigest)
+    parts.push(`Visible palm summary: ${annotations.observationDigest}`);
   if (annotations.lines.length) {
     parts.push(
-      "Visible rekhas: " + annotations.lines.map((line) => `${line.name}${line.note ? ` (${line.note})` : ""}`).join("; "),
+      "Visible rekhas: " +
+        annotations.lines
+          .map((line) => `${line.name}${line.note ? ` (${line.note})` : ""}`)
+          .join("; "),
     );
   }
   if (annotations.mounts.length) {
     parts.push(
-      "Visible parvats: " + annotations.mounts.map((mount) => `${mount.name} ${mount.state}${mount.note ? ` (${mount.note})` : ""}`).join("; "),
+      "Visible parvats: " +
+        annotations.mounts
+          .map((mount) => `${mount.name} ${mount.state}${mount.note ? ` (${mount.note})` : ""}`)
+          .join("; "),
     );
   }
   if (annotations.signs.length) {
     parts.push(
-      "Visible signs: " + annotations.signs.map((sign) => `${sign.name}${sign.meaning ? ` (${sign.meaning})` : ""}`).join("; "),
+      "Visible signs: " +
+        annotations.signs
+          .map((sign) => `${sign.name}${sign.meaning ? ` (${sign.meaning})` : ""}`)
+          .join("; "),
     );
   }
   return parts.join("\n");
@@ -243,7 +268,10 @@ function fallbackRejectedReading(hand: "left" | "right", annotations: Annotation
     summary: "The rekhas remain veiled until the palm is captured clearly.",
     free: [
       { title: "Palm capture required", body },
-      { title: "How to rescan", body: "Place only one open palm in frame, keep a plain background, hold steady, and let the live trace lock onto the palm before continuing." },
+      {
+        title: "How to rescan",
+        body: "Place only one open palm in frame, keep a plain background, hold steady, and let the live trace lock onto the palm before continuing.",
+      },
     ],
     premium: [
       { title: "Bhagya Rekha — Fortune & Pivot Points", body },
@@ -290,7 +318,9 @@ function buildBirthBlock(d: AskInput): string {
         8: "Shani",
         9: "Mangal",
       };
-      parts.push(`Date of Birth: ${d.dob} (Mulank ${mulanka} — ruled by ${grahaMap[mulanka]}; Bhagyank ${bhagyank} — ruled by ${grahaMap[bhagyank]})`);
+      parts.push(
+        `Date of Birth: ${d.dob} (Mulank ${mulanka} — ruled by ${grahaMap[mulanka]}; Bhagyank ${bhagyank} — ruled by ${grahaMap[bhagyank]})`,
+      );
     } else {
       parts.push(`Date of Birth: ${d.dob}`);
     }
@@ -345,13 +375,17 @@ async function callGateway(messages: unknown[], json: boolean, model = "google/g
   if (!res.ok) {
     const text = await res.text();
     if (res.status === 429) throw new Error("The sage is overwhelmed. Try again in a moment.");
-    if (res.status === 402) throw new Error("Reading credits exhausted. Please add credits to continue.");
+    if (res.status === 402)
+      throw new Error("Reading credits exhausted. Please add credits to continue.");
     throw new Error(`AI gateway error: ${res.status} ${text}`);
   }
   return res.json();
 }
 
-async function extractPalmAnnotations(imageDataUrl: string, model = "google/gemini-2.5-flash"): Promise<Annotations> {
+async function extractPalmAnnotations(
+  imageDataUrl: string,
+  model = "google/gemini-2.5-flash",
+): Promise<Annotations> {
   const json = await callGateway(
     [
       { role: "system", content: EXTRACTION_SYSTEM },
@@ -384,16 +418,22 @@ function getPalmAcceptance(annotations: Annotations): ValidateResult {
   const isPalm = annotations.palmDetected && annotations.imageQuality !== "poor" && lineCount >= 2;
   const reason = isPalm
     ? annotations.notes || "Palm detected and traced."
-    : annotations.notes || "Show only one open palm in a plain background with the center of the palm clearly visible.";
+    : annotations.notes ||
+      "Show only one open palm in a plain background with the center of the palm clearly visible.";
   return { isPalm, reason };
 }
 
 export const generateReading = createServerFn({ method: "POST" })
   .inputValidator((d: ReadingInput) => d)
   .handler(async ({ data }): Promise<ReadingResult> => {
-    const hasImage = typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
+    const hasImage =
+      typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
     const annotations = hasImage
-      ? normalizeAnnotations(data.precomputedAnnotations?.palmDetected ? data.precomputedAnnotations : await extractPalmAnnotations(data.imageDataUrl!, "google/gemini-2.5-pro"))
+      ? normalizeAnnotations(
+          data.precomputedAnnotations?.palmDetected
+            ? data.precomputedAnnotations
+            : await extractPalmAnnotations(data.imageDataUrl!, "google/gemini-2.5-pro"),
+        )
       : { ...EMPTY_ANNOTATIONS, notes: "No palm image provided." };
 
     if (hasImage && !getPalmAcceptance(annotations).isPalm) {
@@ -451,8 +491,12 @@ Rules:
     const parsed = JSON.parse(content) as Omit<ReadingResult, "annotations">;
     return {
       scores: parsed.scores ?? { destiny: 0, wealth: 0, love: 0, karma: 0 },
-      free: Array.isArray(parsed.free) ? parsed.free.slice(0, 2) : fallbackRejectedReading(data.hand, annotations).free,
-      premium: Array.isArray(parsed.premium) ? parsed.premium.slice(0, 6) : fallbackRejectedReading(data.hand, annotations).premium,
+      free: Array.isArray(parsed.free)
+        ? parsed.free.slice(0, 2)
+        : fallbackRejectedReading(data.hand, annotations).free,
+      premium: Array.isArray(parsed.premium)
+        ? parsed.premium.slice(0, 6)
+        : fallbackRejectedReading(data.hand, annotations).premium,
       summary: safeText(parsed.summary, "The rekhas speak softly but truly."),
       annotations,
     };
@@ -462,9 +506,16 @@ export const askAcharya = createServerFn({ method: "POST" })
   .inputValidator((d: AskInput) => d)
   .handler(async ({ data }): Promise<AskResult> => {
     if (!data.question?.trim()) throw new Error("Question is empty");
-    const hasImage = typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
+    const hasImage =
+      typeof data.imageDataUrl === "string" && data.imageDataUrl.startsWith("data:image");
     const birthBlock = buildBirthBlock(data);
-    const annotationContext = data.annotationContext || (hasImage ? annotationsToContext(await extractPalmAnnotations(data.imageDataUrl!, "google/gemini-2.5-flash")) : "");
+    const annotationContext =
+      data.annotationContext ||
+      (hasImage
+        ? annotationsToContext(
+            await extractPalmAnnotations(data.imageDataUrl!, "google/gemini-2.5-flash"),
+          )
+        : "");
 
     const userText = `The seeker has already received a reading of their ${data.hand} palm.
 ${data.context ? `Earlier reading summary:\n${data.context}\n` : ""}${annotationContext ? `Observed palm evidence:\n${annotationContext}\n` : ""}${birthBlock}
@@ -488,7 +539,9 @@ Answer as the Acharya in plain spoken prose only. Ground EVERY claim in the Hast
       "google/gemini-2.5-pro",
     );
 
-    const answer = sanitizeAnswer(json.choices?.[0]?.message?.content ?? "The shastra is silent on this query at this moment.");
+    const answer = sanitizeAnswer(
+      json.choices?.[0]?.message?.content ?? "The shastra is silent on this query at this moment.",
+    );
     return { answer: answer || "The shastra is silent on this query at this moment." };
   });
 
@@ -496,7 +549,11 @@ export const scanPalmFrame = createServerFn({ method: "POST" })
   .inputValidator((d: ValidateInput) => d)
   .handler(async ({ data }): Promise<ScanFrameResult> => {
     if (!data.imageDataUrl?.startsWith("data:image")) {
-      return { isPalm: false, reason: "No image provided.", annotations: { ...EMPTY_ANNOTATIONS, notes: "No image provided." } };
+      return {
+        isPalm: false,
+        reason: "No image provided.",
+        annotations: { ...EMPTY_ANNOTATIONS, notes: "No image provided." },
+      };
     }
     const annotations = await extractPalmAnnotations(data.imageDataUrl, "google/gemini-2.5-flash");
     const result = getPalmAcceptance(annotations);
