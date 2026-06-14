@@ -77,15 +77,23 @@ function Reading() {
       (typeof window !== "undefined" && sessionStorage.getItem("hasta:palmImage")) || undefined;
     const annotationsRaw =
       (typeof window !== "undefined" && sessionStorage.getItem("hasta:annotations")) || undefined;
+    let parsedAnnotations: Annotations | undefined;
     if (imageDataUrl) setPalmImage(imageDataUrl);
     if (annotationsRaw) {
       try {
-        setStoredAnnotations(JSON.parse(annotationsRaw) as Annotations);
+        parsedAnnotations = JSON.parse(annotationsRaw) as Annotations;
+        setStoredAnnotations(parsedAnnotations);
       } catch {
         sessionStorage.removeItem("hasta:annotations");
       }
     }
-    fetchReading({ data: { hand: h, imageDataUrl: imageDataUrl || undefined, precomputedAnnotations: annotationsRaw ? JSON.parse(annotationsRaw) : undefined } })
+    fetchReading({
+      data: {
+        hand: h,
+        imageDataUrl: imageDataUrl || undefined,
+        precomputedAnnotations: parsedAnnotations,
+      },
+    })
       .then((r) => !cancelled && setData(r as ReadingData))
       .catch((e: unknown) => !cancelled && setError(e instanceof Error ? e.message : "Failed to generate reading"));
     return () => {
