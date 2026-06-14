@@ -304,24 +304,6 @@ function PalmCanvas({
             />
           )}
 
-          {/* Palm box outline */}
-          {palmDetected && annotations && (
-            <rect
-              x={box.x}
-              y={box.y}
-              width={box.w}
-              height={box.h}
-              rx={Math.min(box.w, box.h) * 0.18}
-              ry={Math.min(box.w, box.h) * 0.18}
-              fill="none"
-              stroke="hsl(var(--accent))"
-              strokeWidth={0.0035}
-              vectorEffect="non-scaling-stroke"
-              opacity={0.35 * drawProgress}
-              strokeDasharray="0.012 0.008"
-            />
-          )}
-
           {loading && (
             <rect x="0" y="0" width="1" height="1" fill="url(#scanGrad)" opacity="0.15">
               <animate attributeName="opacity" values="0.05;0.25;0.05" dur="1.8s" repeatCount="indefinite" />
@@ -440,6 +422,11 @@ function PalmCanvas({
           <span className="px-2.5 py-1 rounded-full border border-border text-foreground/60">
             Palm {palmDetected ? "locked" : "not detected"}
           </span>
+          {annotations.observationDigest && palmDetected && (
+            <span className="px-2.5 py-1 rounded-full border border-border text-foreground/60 max-w-full truncate">
+              {annotations.observationDigest}
+            </span>
+          )}
         </div>
       )}
     </section>
@@ -516,10 +503,22 @@ function AcharyaChat({
   const context = useMemo(() => {
     const parts = [
       `Summary: ${data.summary}`,
+      data.annotations?.observationDigest ? `Observed palm: ${data.annotations.observationDigest}` : null,
       ...data.free.map((f) => `${f.title}: ${f.body}`),
       ...data.premium.slice(0, 2).map((f) => `${f.title}: ${f.body}`),
     ];
-    return parts.join("\n").slice(0, 4000);
+    return parts.filter(Boolean).join("\n").slice(0, 4000);
+  }, [data]);
+
+  const annotationContext = useMemo(() => {
+    const notes = [
+      data.annotations?.notes,
+      data.annotations?.observationDigest,
+      data.annotations?.lines?.length
+        ? `Visible rekhas: ${data.annotations.lines.map((line) => line.name).join(", ")}`
+        : null,
+    ];
+    return notes.filter(Boolean).join("\n");
   }, [data]);
 
   const saveBirth = () => {
@@ -542,6 +541,7 @@ function AcharyaChat({
           question,
           imageDataUrl: imageDataUrl ?? undefined,
           context,
+          annotationContext,
           name: name || undefined,
           dob: dob || undefined,
           tob: tob || undefined,
@@ -579,7 +579,7 @@ function AcharyaChat({
           <p className="text-sm font-serif italic text-foreground/85">
             "Your reading is only the beginning. Ask me anything — marriage, wealth, dharma."
           </p>
-          <div className="text-[10px] uppercase tracking-widest font-bold text-accent mt-2">— Acharya Hasta</div>
+          <div className="text-[10px] uppercase tracking-widest font-bold text-accent mt-2">— Acharya AI</div>
         </div>
       )}
 
@@ -590,7 +590,7 @@ function AcharyaChat({
               <div className="flex items-center gap-3">
                 <div className="size-10 rounded-full bg-accent flex items-center justify-center text-xl">🪔</div>
                 <div>
-                  <div className="font-serif text-lg">Acharya Hasta</div>
+                  <div className="font-serif text-lg">Acharya AI</div>
                   <div className="text-[10px] uppercase tracking-widest text-accent">Hasta Samudrika Shastra · Live</div>
                 </div>
               </div>
