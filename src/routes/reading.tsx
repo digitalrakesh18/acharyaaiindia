@@ -45,6 +45,7 @@ type Annotations = {
   palmBox: PalmBox;
   imageQuality: "excellent" | "good" | "poor";
   notes?: string;
+  observationDigest?: string;
   lines: LineAnno[];
   mounts: MountAnno[];
   signs: SignAnno[];
@@ -63,6 +64,7 @@ function Reading() {
   const [error, setError] = useState<string | null>(null);
   const [hand, setHand] = useState<"left" | "right">("right");
   const [palmImage, setPalmImage] = useState<string | null>(null);
+  const [storedAnnotations, setStoredAnnotations] = useState<Annotations | undefined>(undefined);
 
   useEffect(() => {
     const h =
@@ -73,8 +75,17 @@ function Reading() {
     let cancelled = false;
     const imageDataUrl =
       (typeof window !== "undefined" && sessionStorage.getItem("hasta:palmImage")) || undefined;
+    const annotationsRaw =
+      (typeof window !== "undefined" && sessionStorage.getItem("hasta:annotations")) || undefined;
     if (imageDataUrl) setPalmImage(imageDataUrl);
-    fetchReading({ data: { hand: h, imageDataUrl: imageDataUrl || undefined } })
+    if (annotationsRaw) {
+      try {
+        setStoredAnnotations(JSON.parse(annotationsRaw) as Annotations);
+      } catch {
+        sessionStorage.removeItem("hasta:annotations");
+      }
+    }
+    fetchReading({ data: { hand: h, imageDataUrl: imageDataUrl || undefined, precomputedAnnotations: annotationsRaw ? JSON.parse(annotationsRaw) : undefined } })
       .then((r) => !cancelled && setData(r as ReadingData))
       .catch((e: unknown) => !cancelled && setError(e instanceof Error ? e.message : "Failed to generate reading"));
     return () => {
@@ -103,7 +114,7 @@ function Reading() {
         </div>
 
         {palmImage && (
-          <PalmCanvas image={palmImage} annotations={data?.annotations} loading={!data && !error} />
+          <PalmCanvas image={palmImage} annotations={data?.annotations ?? storedAnnotations} loading={!data && !error} />
         )}
 
         {error && (
