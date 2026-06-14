@@ -9,9 +9,17 @@ export const Route = createFileRoute("/reading")({
   head: () => ({
     meta: [
       { title: "Your Destiny Reading — Acharya AI Palmistry" },
-      { name: "description", content: "Your personalized AI palm reading rooted in Hasta Samudrika Shastra — lines, mounts, signs and a full destiny analysis." },
+      {
+        name: "description",
+        content:
+          "Your personalized AI palm reading rooted in Hasta Samudrika Shastra — lines, mounts, signs and a full destiny analysis.",
+      },
       { property: "og:title", content: "Your Destiny Reading — Acharya AI Palmistry" },
-      { property: "og:description", content: "A personalized AI palm reading drawn from your own palm and the Hasta Samudrika Shastra." },
+      {
+        property: "og:description",
+        content:
+          "A personalized AI palm reading drawn from your own palm and the Hasta Samudrika Shastra.",
+      },
       { property: "og:url", content: "https://hasta-aura-reveal.lovable.app/reading" },
     ],
     links: [{ rel: "canonical", href: "https://hasta-aura-reveal.lovable.app/reading" }],
@@ -23,8 +31,13 @@ export const Route = createFileRoute("/reading")({
           "@type": "Service",
           name: "AI Palm Reading",
           serviceType: "Palmistry",
-          provider: { "@type": "Organization", name: "Acharya AI", url: "https://hasta-aura-reveal.lovable.app/" },
-          description: "Personalized AI palm reading rooted in Hasta Samudrika Shastra, covering destiny, wealth, love and karma.",
+          provider: {
+            "@type": "Organization",
+            name: "Acharya AI",
+            url: "https://hasta-aura-reveal.lovable.app/",
+          },
+          description:
+            "Personalized AI palm reading rooted in Hasta Samudrika Shastra, covering destiny, wealth, love and karma.",
           areaServed: "Worldwide",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
@@ -37,7 +50,13 @@ export const Route = createFileRoute("/reading")({
 type Section = { title: string; body: string };
 type Point = { x: number; y: number };
 type LineAnno = { name: string; color: string; points: Point[]; note?: string };
-type MountAnno = { name: string; x: number; y: number; state: "raised" | "flat" | "marked"; note?: string };
+type MountAnno = {
+  name: string;
+  x: number;
+  y: number;
+  state: "raised" | "flat" | "marked";
+  note?: string;
+};
 type SignAnno = { name: string; x: number; y: number; meaning?: string };
 type PalmBox = { x: number; y: number; w: number; h: number };
 type Annotations = {
@@ -45,6 +64,7 @@ type Annotations = {
   palmBox: PalmBox;
   imageQuality: "excellent" | "good" | "poor";
   notes?: string;
+  observationDigest?: string;
   lines: LineAnno[];
   mounts: MountAnno[];
   signs: SignAnno[];
@@ -63,6 +83,7 @@ function Reading() {
   const [error, setError] = useState<string | null>(null);
   const [hand, setHand] = useState<"left" | "right">("right");
   const [palmImage, setPalmImage] = useState<string | null>(null);
+  const [storedAnnotations, setStoredAnnotations] = useState<Annotations | undefined>(undefined);
 
   useEffect(() => {
     const h =
@@ -73,10 +94,30 @@ function Reading() {
     let cancelled = false;
     const imageDataUrl =
       (typeof window !== "undefined" && sessionStorage.getItem("hasta:palmImage")) || undefined;
+    const annotationsRaw =
+      (typeof window !== "undefined" && sessionStorage.getItem("hasta:annotations")) || undefined;
+    let parsedAnnotations: Annotations | undefined;
     if (imageDataUrl) setPalmImage(imageDataUrl);
-    fetchReading({ data: { hand: h, imageDataUrl: imageDataUrl || undefined } })
+    if (annotationsRaw) {
+      try {
+        parsedAnnotations = JSON.parse(annotationsRaw) as Annotations;
+        setStoredAnnotations(parsedAnnotations);
+      } catch {
+        sessionStorage.removeItem("hasta:annotations");
+      }
+    }
+    fetchReading({
+      data: {
+        hand: h,
+        imageDataUrl: imageDataUrl || undefined,
+        precomputedAnnotations: parsedAnnotations,
+      },
+    })
       .then((r) => !cancelled && setData(r as ReadingData))
-      .catch((e: unknown) => !cancelled && setError(e instanceof Error ? e.message : "Failed to generate reading"));
+      .catch(
+        (e: unknown) =>
+          !cancelled && setError(e instanceof Error ? e.message : "Failed to generate reading"),
+      );
     return () => {
       cancelled = true;
     };
@@ -87,7 +128,9 @@ function Reading() {
       <SiteNav />
       <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 space-y-12">
         <div className="text-center space-y-4">
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Your Destiny Reading</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+            Your Destiny Reading
+          </span>
           <h1 className="text-4xl md:text-6xl font-serif text-balance">
             What your <span className="italic text-accent">{hand}</span> palm revealed
           </h1>
@@ -103,7 +146,11 @@ function Reading() {
         </div>
 
         {palmImage && (
-          <PalmCanvas image={palmImage} annotations={data?.annotations} loading={!data && !error} />
+          <PalmCanvas
+            image={palmImage}
+            annotations={data?.annotations ?? storedAnnotations}
+            loading={!data && !error}
+          />
         )}
 
         {error && (
@@ -123,7 +170,9 @@ function Reading() {
               <div className="font-serif text-3xl text-accent">
                 {s.v !== undefined ? s.v.toFixed(1) : <span className="opacity-30">—</span>}
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mt-1">{s.l}</div>
+              <div className="text-[10px] uppercase tracking-widest text-foreground/40 font-bold mt-1">
+                {s.l}
+              </div>
             </div>
           ))}
         </div>
@@ -132,7 +181,10 @@ function Reading() {
           {!data && !error && (
             <div className="space-y-6">
               {[0, 1].map((i) => (
-                <div key={i} className="p-8 rounded-3xl border border-border bg-card/60 space-y-3 animate-pulse">
+                <div
+                  key={i}
+                  className="p-8 rounded-3xl border border-border bg-card/60 space-y-3 animate-pulse"
+                >
                   <div className="h-6 w-1/3 bg-accent/20 rounded" />
                   <div className="h-4 w-full bg-foreground/10 rounded" />
                   <div className="h-4 w-5/6 bg-foreground/10 rounded" />
@@ -155,9 +207,13 @@ function Reading() {
         {data && (
           <div className="space-y-8">
             <div className="text-center space-y-2 pt-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">The Full Shastra Reading</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+                The Full Shastra Reading
+              </span>
               <h2 className="text-3xl md:text-4xl font-serif">Your complete destiny analysis</h2>
-              <p className="text-xs text-foreground/50 uppercase tracking-widest font-mono">Always free · Unlimited readings</p>
+              <p className="text-xs text-foreground/50 uppercase tracking-widest font-mono">
+                Always free · Unlimited readings
+              </p>
             </div>
             {data.premium.map((p) => (
               <article key={p.title} className="p-8 rounded-3xl border border-accent/20 bg-card/60">
@@ -169,7 +225,10 @@ function Reading() {
         )}
 
         <div className="text-center pt-8">
-          <Link to="/scan" className="text-sm text-foreground/60 hover:text-accent underline underline-offset-4">
+          <Link
+            to="/scan"
+            className="text-sm text-foreground/60 hover:text-accent underline underline-offset-4"
+          >
             ← Scan another palm
           </Link>
         </div>
@@ -246,7 +305,11 @@ function PalmCanvas({
   return (
     <section className="space-y-4">
       <div className="relative rounded-3xl overflow-hidden border border-border bg-card shadow-gold-sm">
-        <img src={image} alt="Your scanned palm with lines auto-traced by Acharya AI" className="w-full h-auto block" />
+        <img
+          src={image}
+          alt="Your scanned palm with lines auto-traced by Acharya AI"
+          className="w-full h-auto block"
+        />
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none"
           viewBox="0 0 1 1"
@@ -285,27 +348,14 @@ function PalmCanvas({
             />
           )}
 
-          {/* Palm box outline */}
-          {palmDetected && annotations && (
-            <rect
-              x={box.x}
-              y={box.y}
-              width={box.w}
-              height={box.h}
-              rx={Math.min(box.w, box.h) * 0.18}
-              ry={Math.min(box.w, box.h) * 0.18}
-              fill="none"
-              stroke="hsl(var(--accent))"
-              strokeWidth={0.0035}
-              vectorEffect="non-scaling-stroke"
-              opacity={0.35 * drawProgress}
-              strokeDasharray="0.012 0.008"
-            />
-          )}
-
           {loading && (
             <rect x="0" y="0" width="1" height="1" fill="url(#scanGrad)" opacity="0.15">
-              <animate attributeName="opacity" values="0.05;0.25;0.05" dur="1.8s" repeatCount="indefinite" />
+              <animate
+                attributeName="opacity"
+                values="0.05;0.25;0.05"
+                dur="1.8s"
+                repeatCount="indefinite"
+              />
             </rect>
           )}
 
@@ -412,8 +462,8 @@ function PalmCanvas({
               (quality === "excellent"
                 ? "border-green-500/40 text-green-400"
                 : quality === "good"
-                ? "border-accent/40 text-accent"
-                : "border-amber-400/40 text-amber-400")
+                  ? "border-accent/40 text-accent"
+                  : "border-amber-400/40 text-amber-400")
             }
           >
             Image: {quality ?? "—"}
@@ -421,6 +471,11 @@ function PalmCanvas({
           <span className="px-2.5 py-1 rounded-full border border-border text-foreground/60">
             Palm {palmDetected ? "locked" : "not detected"}
           </span>
+          {annotations.observationDigest && palmDetected && (
+            <span className="px-2.5 py-1 rounded-full border border-border text-foreground/60 max-w-full truncate">
+              {annotations.observationDigest}
+            </span>
+          )}
         </div>
       )}
     </section>
@@ -482,7 +537,9 @@ function AcharyaChat({
         setGender(b.gender ?? "");
         if (b.dob) setDetailsOpen(false);
       }
-    } catch {}
+    } catch {
+      return;
+    }
   }, []);
 
   useEffect(() => {
@@ -497,16 +554,32 @@ function AcharyaChat({
   const context = useMemo(() => {
     const parts = [
       `Summary: ${data.summary}`,
+      data.annotations?.observationDigest
+        ? `Observed palm: ${data.annotations.observationDigest}`
+        : null,
       ...data.free.map((f) => `${f.title}: ${f.body}`),
       ...data.premium.slice(0, 2).map((f) => `${f.title}: ${f.body}`),
     ];
-    return parts.join("\n").slice(0, 4000);
+    return parts.filter(Boolean).join("\n").slice(0, 4000);
+  }, [data]);
+
+  const annotationContext = useMemo(() => {
+    const notes = [
+      data.annotations?.notes,
+      data.annotations?.observationDigest,
+      data.annotations?.lines?.length
+        ? `Visible rekhas: ${data.annotations.lines.map((line) => line.name).join(", ")}`
+        : null,
+    ];
+    return notes.filter(Boolean).join("\n");
   }, [data]);
 
   const saveBirth = () => {
     try {
       localStorage.setItem("hasta:birth", JSON.stringify({ name, dob, tob, pob, gender }));
-    } catch {}
+    } catch {
+      return;
+    }
     setDetailsOpen(false);
   };
 
@@ -523,6 +596,7 @@ function AcharyaChat({
           question,
           imageDataUrl: imageDataUrl ?? undefined,
           context,
+          annotationContext,
           name: name || undefined,
           dob: dob || undefined,
           tob: tob || undefined,
@@ -534,7 +608,10 @@ function AcharyaChat({
     } catch (e) {
       setMsgs((m) => [
         ...m,
-        { role: "acharya", text: e instanceof Error ? e.message : "The shastra is silent at this moment." },
+        {
+          role: "acharya",
+          text: e instanceof Error ? e.message : "The shastra is silent at this moment.",
+        },
       ]);
     } finally {
       setBusy(false);
@@ -551,7 +628,9 @@ function AcharyaChat({
         }}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-3 bg-accent text-accent-foreground pl-4 pr-5 py-3 rounded-full shadow-gold hover:scale-105 transition-all"
       >
-        <span className="size-9 rounded-full bg-background/20 flex items-center justify-center text-lg">🪔</span>
+        <span className="size-9 rounded-full bg-background/20 flex items-center justify-center text-lg">
+          🪔
+        </span>
         <span className="font-bold text-sm">Ask the Acharya</span>
       </button>
 
@@ -560,7 +639,9 @@ function AcharyaChat({
           <p className="text-sm font-serif italic text-foreground/85">
             "Your reading is only the beginning. Ask me anything — marriage, wealth, dharma."
           </p>
-          <div className="text-[10px] uppercase tracking-widest font-bold text-accent mt-2">— Acharya Hasta</div>
+          <div className="text-[10px] uppercase tracking-widest font-bold text-accent mt-2">
+            — Acharya AI
+          </div>
         </div>
       )}
 
@@ -569,20 +650,30 @@ function AcharyaChat({
           <div className="w-full max-w-lg h-[80vh] md:h-[640px] bg-card border border-accent/30 rounded-t-3xl md:rounded-3xl shadow-gold flex flex-col overflow-hidden">
             <header className="flex items-center justify-between px-5 py-4 border-b border-border bg-gradient-to-r from-accent/10 to-transparent">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full bg-accent flex items-center justify-center text-xl">🪔</div>
+                <div className="size-10 rounded-full bg-accent flex items-center justify-center text-xl">
+                  🪔
+                </div>
                 <div>
-                  <div className="font-serif text-lg">Acharya Hasta</div>
-                  <div className="text-[10px] uppercase tracking-widest text-accent">Hasta Samudrika Shastra · Live</div>
+                  <div className="font-serif text-lg">Acharya AI</div>
+                  <div className="text-[10px] uppercase tracking-widest text-accent">
+                    Hasta Samudrika Shastra · Live
+                  </div>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="text-foreground/60 hover:text-foreground text-2xl leading-none">
+              <button
+                onClick={() => setOpen(false)}
+                className="text-foreground/60 hover:text-foreground text-2xl leading-none"
+              >
                 ×
               </button>
             </header>
 
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
               {msgs.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
+                <div
+                  key={i}
+                  className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
+                >
                   <div
                     className={
                       m.role === "user"

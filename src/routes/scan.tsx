@@ -2,15 +2,23 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteNav } from "@/components/site/Nav";
-import { validatePalm } from "@/lib/reading.functions";
+import { scanPalmFrame } from "@/lib/reading.functions";
 
 export const Route = createFileRoute("/scan")({
   head: () => ({
     meta: [
       { title: "Scan Your Palm — Free AI Palm Reading | Acharya AI" },
-      { name: "description", content: "Upload or capture your palm. The Acharya reads it instantly using the full Hasta Samudrika Shastra. Free and unlimited." },
+      {
+        name: "description",
+        content:
+          "Upload or capture your palm. The Acharya reads it instantly using the full Hasta Samudrika Shastra. Free and unlimited.",
+      },
       { property: "og:title", content: "Scan Your Palm — Free AI Palm Reading | Acharya AI" },
-      { property: "og:description", content: "Upload or capture your palm and get an instant AI reading rooted in Hasta Samudrika Shastra." },
+      {
+        property: "og:description",
+        content:
+          "Upload or capture your palm and get an instant AI reading rooted in Hasta Samudrika Shastra.",
+      },
       { property: "og:url", content: "https://hasta-aura-reveal.lovable.app/scan" },
     ],
     links: [{ rel: "canonical", href: "https://hasta-aura-reveal.lovable.app/scan" }],
@@ -19,6 +27,25 @@ export const Route = createFileRoute("/scan")({
 });
 
 type Step = "hand" | "capture" | "analyzing";
+type Point = { x: number; y: number };
+type LineAnno = { name: string; color: string; points: Point[]; note?: string };
+type PalmBox = { x: number; y: number; w: number; h: number };
+type Annotations = {
+  palmDetected: boolean;
+  palmBox: PalmBox;
+  imageQuality: "excellent" | "good" | "poor";
+  notes?: string;
+  observationDigest?: string;
+  lines: LineAnno[];
+  mounts: Array<{
+    name: string;
+    x: number;
+    y: number;
+    state: "raised" | "flat" | "marked";
+    note?: string;
+  }>;
+  signs: Array<{ name: string; x: number; y: number; meaning?: string }>;
+};
 
 function ScanFlow() {
   const [step, setStep] = useState<Step>("hand");
@@ -32,7 +59,11 @@ function ScanFlow() {
           <HandPicker
             onSelect={(h) => {
               setHand(h);
-              try { sessionStorage.setItem("hasta:hand", h); } catch {}
+              try {
+                sessionStorage.setItem("hasta:hand", h);
+              } catch {
+                return;
+              }
               setStep("capture");
             }}
           />
@@ -50,10 +81,13 @@ function HandPicker({ onSelect }: { onSelect: (h: "left" | "right") => void }) {
   return (
     <div className="py-12 space-y-12">
       <div className="text-center space-y-4">
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Step 1 of 3</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+          Step 1 of 3
+        </span>
         <h1 className="text-4xl md:text-6xl font-serif">Choose your dominant hand</h1>
         <p className="text-foreground/60 max-w-lg mx-auto">
-          Your dominant hand reveals the destiny you are actively creating. Your non-dominant hand reveals what you were born with.
+          Your dominant hand reveals the destiny you are actively creating. Your non-dominant hand
+          reveals what you were born with.
         </p>
       </div>
       <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -68,7 +102,9 @@ function HandPicker({ onSelect }: { onSelect: (h: "left" | "right") => void }) {
               {h} Hand
             </div>
             <p className="text-sm text-foreground/60">
-              {h === "left" ? "Reveals inherited karma and innate gifts." : "Reveals the destiny you are forging now."}
+              {h === "left"
+                ? "Reveals inherited karma and innate gifts."
+                : "Reveals the destiny you are forging now."}
             </p>
           </button>
         ))}
@@ -77,8 +113,80 @@ function HandPicker({ onSelect }: { onSelect: (h: "left" | "right") => void }) {
   );
 }
 
+function smoothPath(points: Point[], box: PalmBox) {
+  const toImg = (p: Point) => ({ x: box.x + p.x * box.w, y: box.y + p.y * box.h });
+  const P = points.map(toImg);
+  if (P.length === 0) return "";
+  if (P.length === 1) return `M${P[0].x},${P[0].y}`;
+  if (P.length === 2) return `M${P[0].x},${P[0].y} L${P[1].x},${P[1].y}`;
+  let d = `M${P[0].x.toFixed(5)},${P[0].y.toFixed(5)}`;
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[i - 1] ?? P[i];
+    const p1 = P[i];
+    const p2 = P[i + 1];
+    const p3 = P[i + 2] ?? p2;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(5)},${c1y.toFixed(5)} ${c2x.toFixed(5)},${c2y.toFixed(5)} ${p2.x.toFixed(5)},${p2.y.toFixed(5)}`;
+  }
+  return d;
+}
+
+function LivePalmOverlay({
+  annotations,
+  pulse = false,
+}: {
+  annotations: Annotations | null;
+  pulse?: boolean;
+}) {
+  if (!annotations?.palmDetected || !annotations.lines.length) return null;
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      viewBox="0 0 1 1"
+      preserveAspectRatio="none"
+    >
+      {annotations.lines.map((line) => {
+        const d = smoothPath(line.points, annotations.palmBox);
+        if (!d) return null;
+        return (
+          <g key={line.name}>
+            <path
+              d={d}
+              fill="none"
+              stroke={line.color}
+              strokeWidth={0.016}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              opacity={0.18}
+              className={pulse ? "animate-pulse" : undefined}
+            />
+            <path
+              d={d}
+              fill="none"
+              stroke={line.color}
+              strokeWidth={0.006}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              opacity={0.95}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 /** Compress an image source to a JPEG data URL ≤ ~900px on the long edge. */
-async function compressToDataUrl(src: Blob | string, maxDim = 1280, quality = 0.88): Promise<string> {
+async function compressToDataUrl(
+  src: Blob | string,
+  maxDim = 1280,
+  quality = 0.88,
+): Promise<string> {
   const url = typeof src === "string" ? src : URL.createObjectURL(src);
   try {
     const img = await new Promise<HTMLImageElement>((res, rej) => {
@@ -104,7 +212,7 @@ async function compressToDataUrl(src: Blob | string, maxDim = 1280, quality = 0.
 function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const verify = useServerFn(validatePalm);
+  const scanFrame = useServerFn(scanPalmFrame);
   const [mode, setMode] = useState<"camera" | "upload">("camera");
   const [error, setError] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
@@ -113,6 +221,7 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
   const [status, setStatus] = useState<string>("");
   const [liveState, setLiveState] = useState<"searching" | "detected" | "rejected">("searching");
   const [liveMsg, setLiveMsg] = useState<string>("Searching for your palm…");
+  const [liveAnnotations, setLiveAnnotations] = useState<Annotations | null>(null);
   const consecutiveDetectsRef = useRef(0);
   const scanningRef = useRef(false);
   const completedRef = useRef(false);
@@ -176,10 +285,11 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
         }
         scanningRef.current = true;
         try {
-          const v = await verify({ data: { imageDataUrl: frame } });
+          const v = await scanFrame({ data: { imageDataUrl: frame } });
           if (cancelled || completedRef.current) break;
           if (v.isPalm) {
             consecutiveDetectsRef.current += 1;
+            setLiveAnnotations(v.annotations);
             setLiveState("detected");
             setLiveMsg(
               consecutiveDetectsRef.current >= 2
@@ -199,6 +309,7 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
             }
           } else {
             consecutiveDetectsRef.current = 0;
+            setLiveAnnotations(v.annotations.palmDetected ? v.annotations : null);
             setLiveState("rejected");
             setLiveMsg(v.reason || "Not a clear palm — show your open palm in plain background.");
           }
@@ -207,7 +318,7 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
         } finally {
           scanningRef.current = false;
         }
-        await new Promise((r) => setTimeout(r, 1800));
+        await new Promise((r) => setTimeout(r, 1200));
       }
     };
     loop();
@@ -220,9 +331,10 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
   const handAndGo = async (dataUrl: string) => {
     setBusy(true);
     setError(null);
-    setStatus("Verifying your palm…");
+    setStatus("Tracing your palm lines…");
     try {
-      const v = await verify({ data: { imageDataUrl: dataUrl } });
+      const v = await scanFrame({ data: { imageDataUrl: dataUrl } });
+      setLiveAnnotations(v.annotations);
       if (!v.isPalm) {
         setError(
           `${v.reason} Please show your open ${hand} palm against a plain background, well-lit, with all five fingers visible.`,
@@ -236,9 +348,11 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
       }
       try {
         sessionStorage.setItem("hasta:palmImage", dataUrl);
+        sessionStorage.setItem("hasta:annotations", JSON.stringify(v.annotations));
       } catch {
         const smaller = await compressToDataUrl(dataUrl, 640, 0.7);
         sessionStorage.setItem("hasta:palmImage", smaller);
+        sessionStorage.setItem("hasta:annotations", JSON.stringify(v.annotations));
       }
       onComplete();
     } catch (e) {
@@ -286,12 +400,16 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
   return (
     <div className="py-8 space-y-8">
       <div className="text-center space-y-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Step 2 of 3</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+          Step 2 of 3
+        </span>
         <h1 className="text-3xl md:text-5xl font-serif">
-          Click a photo of your <span className="italic text-accent">{hand}</span> palm
+          Scan your <span className="italic text-accent">{hand}</span> palm live
         </h1>
         <p className="text-foreground/60 max-w-xl mx-auto">
-          Hold your open {hand} palm in front of the camera against a plain background. The Acharya will detect it in real time and capture automatically — nothing else will be accepted.
+          Hold only your open {hand} palm in front of the camera against a plain background. The
+          live scanner will trace the visible rekhas in real time and reject anything that is not a
+          clear palm.
         </p>
       </div>
 
@@ -301,11 +419,19 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
           {(["camera", "upload"] as const).map((m) => (
             <button
               key={m}
-              onClick={() => { setError(null); setPreview(null); setMode(m); }}
-              aria-label={m === "camera" ? "Use live camera to capture palm" : "Upload an existing palm photo"}
+              onClick={() => {
+                setError(null);
+                setPreview(null);
+                setMode(m);
+              }}
+              aria-label={
+                m === "camera" ? "Use live camera to capture palm" : "Upload an existing palm photo"
+              }
               aria-pressed={mode === m}
               className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-                mode === m ? "bg-accent text-accent-foreground shadow-gold-sm" : "text-foreground/60 hover:text-foreground"
+                mode === m
+                  ? "bg-accent text-accent-foreground shadow-gold-sm"
+                  : "text-foreground/60 hover:text-foreground"
               }`}
             >
               {m === "camera" ? "Live Camera" : "Upload Photo"}
@@ -317,11 +443,17 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
       <div className="relative max-w-2xl mx-auto aspect-[3/4] rounded-3xl overflow-hidden border border-border bg-card shadow-gold-sm">
         {preview ? (
           <>
-            <img src={preview} alt="Captured palm" className="absolute inset-0 w-full h-full object-cover" />
+            <img
+              src={preview}
+              alt="Captured palm"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             {busy && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm gap-4">
                 <div className="size-12 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
-                <p className="text-sm font-mono uppercase tracking-widest text-accent">{status || "Verifying…"}</p>
+                <p className="text-sm font-mono uppercase tracking-widest text-accent">
+                  {status || "Verifying…"}
+                </p>
               </div>
             )}
           </>
@@ -332,7 +464,10 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
               <h3 className="font-serif text-xl">Camera unavailable</h3>
               <p className="text-foreground/60 text-sm max-w-sm">{error}</p>
               <button
-                onClick={() => { setError(null); setMode("upload"); }}
+                onClick={() => {
+                  setError(null);
+                  setMode("upload");
+                }}
                 className="mt-2 bg-accent text-accent-foreground px-6 py-3 rounded-full font-bold text-sm"
               >
                 Upload a photo instead
@@ -346,7 +481,7 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
                 muted
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              {/* Subtle scanning aura — no border outlines, no palm guide */}
+              <LivePalmOverlay annotations={liveAnnotations} pulse={liveState === "detected"} />
               <div className="pointer-events-none absolute inset-0">
                 <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent animate-[scan-line_2.6s_linear_infinite]" />
               </div>
@@ -356,14 +491,18 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
                   (liveState === "detected"
                     ? "bg-green-500/15 border-green-500/50 text-green-300"
                     : liveState === "rejected"
-                    ? "bg-amber-500/15 border-amber-500/50 text-amber-300"
-                    : "bg-background/80 border-accent/30 text-accent")
+                      ? "bg-amber-500/15 border-amber-500/50 text-amber-300"
+                      : "bg-background/80 border-accent/30 text-accent")
                 }
               >
                 <span
                   className={
                     "size-1.5 rounded-full animate-pulse " +
-                    (liveState === "detected" ? "bg-green-400" : liveState === "rejected" ? "bg-amber-400" : "bg-accent")
+                    (liveState === "detected"
+                      ? "bg-green-400"
+                      : liveState === "rejected"
+                        ? "bg-amber-400"
+                        : "bg-accent")
                   }
                 />
                 {streaming ? liveMsg : "Initializing camera…"}
@@ -378,7 +517,8 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
             <div className="text-accent text-5xl">📷</div>
             <h3 className="font-serif text-2xl">Upload your palm photo</h3>
             <p className="text-foreground/60 text-sm max-w-sm">
-              Tap to choose — open {hand} palm, plain background, well-lit.
+              Tap to choose — only the open {hand} palm, plain background, well-lit, center lines
+              visible.
             </p>
             <span className="mt-2 bg-accent text-accent-foreground px-6 py-3 rounded-full font-bold text-sm">
               Choose photo
