@@ -346,13 +346,27 @@ function CaptureStep({ hand, onComplete }: { hand: "left" | "right"; onComplete:
                 muted
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute top-4 left-4 size-10 border-t-2 border-l-2 border-accent/70" />
-              <div className="absolute top-4 right-4 size-10 border-t-2 border-r-2 border-accent/70" />
-              <div className="absolute bottom-4 left-4 size-10 border-b-2 border-l-2 border-accent/70" />
-              <div className="absolute bottom-4 right-4 size-10 border-b-2 border-r-2 border-accent/70" />
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur px-4 py-2 rounded-full border border-accent/30 text-xs font-mono text-accent uppercase tracking-widest flex items-center gap-2">
-                <span className="size-1.5 bg-green-500 rounded-full animate-pulse" />
-                {streaming ? "Plain background · good light" : "Initializing camera…"}
+              {/* Subtle scanning aura — no border outlines, no palm guide */}
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-accent/80 to-transparent animate-[scan-line_2.6s_linear_infinite]" />
+              </div>
+              <div
+                className={
+                  "absolute bottom-5 left-1/2 -translate-x-1/2 backdrop-blur px-4 py-2 rounded-full text-xs font-mono uppercase tracking-widest flex items-center gap-2 border " +
+                  (liveState === "detected"
+                    ? "bg-green-500/15 border-green-500/50 text-green-300"
+                    : liveState === "rejected"
+                    ? "bg-amber-500/15 border-amber-500/50 text-amber-300"
+                    : "bg-background/80 border-accent/30 text-accent")
+                }
+              >
+                <span
+                  className={
+                    "size-1.5 rounded-full animate-pulse " +
+                    (liveState === "detected" ? "bg-green-400" : liveState === "rejected" ? "bg-amber-400" : "bg-accent")
+                  }
+                />
+                {streaming ? liveMsg : "Initializing camera…"}
               </div>
             </>
           )
