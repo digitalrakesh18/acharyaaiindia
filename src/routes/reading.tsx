@@ -522,6 +522,7 @@ function AcharyaChat({
   const [tob, setTob] = useState("");
   const [pob, setPob] = useState("");
   const [gender, setGender] = useState<"" | "male" | "female" | "other">("");
+  const [language, setLanguage] = useState<"english" | "hindi" | "telugu">("english");
   const [detailsOpen, setDetailsOpen] = useState(true);
   const hasDetails = Boolean(dob || name || pob);
 
