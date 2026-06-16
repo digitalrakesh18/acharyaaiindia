@@ -1,3 +1,60 @@
+# HANUMAT JYOTISHAM — LAKOTA PRASHNALU (40-Question Prashna Shastra)
+# Author: Daivajna-ratna Smt. Janupati Padmavati
+# Publisher: Sri Balaji Publications, Vijayawada (2013)
+# Language: Telugu (script). Below is the OCR-extracted verbatim text.
+#
+# SYSTEM SUMMARY (for the Acharya to use alongside Hasta Samudrika Shastra):
+# This is a classical PRASHNA (oracle) system based on Lord Hanuman. The
+# seeker silently fixes one question in mind and picks a number 1-10 from a
+# chakra (wheel). The chosen cell maps to one of 40 question-categories and
+# yields a verdict spoken in the voice of Sri Rama, Sri Lakshmana, Sri
+# Bharata, Sri Shatrughna, Sri Hanuman, Sri Sugriva, Sri Vibhishana, Sri
+# Angada, Sri Jambavanta or Sri Nala. The 40 prashna chapters are:
+#
+#  1. Gamana (journey)            2. Aagamana (arrival of person)
+#  3. Krishi-karma (agriculture)  4. Vyapara (business)
+#  5. Ganga-snana (pilgrimage)    6. Mrityu-chinta (life-threat)
+#  7. Devata-aradhana (worship)   8. Sahitya (literature/study)
+#  9. Vasa-nirupana (residence)  10. Mantri (advisor/help)
+# 11. Dhanam (wealth)            12. Mano-korikalu (desires)
+# 13. Roga (disease)             14. Dhana-agama (income)
+# 15. Vaada (dispute)            16. Vivada (quarrel/litigation)
+# 17. Mitratva (friendship)      18. Yuddha (conflict/war)
+# 19. Melana (meeting)           20. Yachana (request granted?)
+# 21. Prapti (gain/attainment)   22. Sandeha (doubt yes/no)
+# 23. Svasthana (own place)      24. Nashta-dravya (lost article)
+# 25. Grahaka (buyer/client)     26. Bheeti (fear)
+# 27. Garbha (pregnancy/child)   28. Chintana (worry outcome)
+# 29. Bandhana (imprisonment)    30. Vishwasa (trust in person)
+# 31. Vidya (education)          32. Doota (messenger/news)
+# 33. Sambandha (relationship)   34. Rajya (authority/job/post)
+# 35. Santana (progeny)          36. Sanchaya (savings/treasure)
+# 37. Vivaha (marriage)          38. Vikraya (sale)
+# 39. Pranaya (love)             40. Kushala (well-being of absent)
+#
+# USAGE BY ACHARYA:
+# When a seeker asks a "when / will it happen / where / yes-or-no" question,
+# the Acharya may invoke this PRASHNA layer in addition to the palm reading:
+# silently map the question to the closest of the 40 categories above, give
+# a clear yes/no/delay verdict and a direction (east/west/south/north) and a
+# tight time window. The voice-of-Rama answers on page 50 (verbatim below)
+# are exemplary in tone: short, direct, with direction + time-frame.
+#
+# EXAMPLE VERBATIM ANSWERS (Sri Rama / Sri Lakshmana — translated):
+# - Marriage will be delayed; it happens to the south of the village.
+# - Son will surely be born in this pregnancy.
+# - The journey south will not take place.
+# - Wish for Ganga-snana will be fulfilled.
+# - Business will not profit; capital also lost.
+# - Release from prison within this week.
+# - Apavadas (false accusations) will be removed soon.
+# - Marriage, though delayed, occurs to the east of the home.
+# - Start the studies — they will finish soon.
+# - After slight delay, many sons.
+# - Travel to south-east (Agneya) brings auspicious results.
+# - Agriculture: cultivate, profit is certain.
+#
+# === BEGIN VERBATIM TELUGU OCR ===
 # Document parsed from: Adobe_Scan_16_Jun_2026_1.pdf
 
 ## Page 1
@@ -1356,101 +1413,4 @@ we shall correct them in our next edition. All disputes are subject to Vijayawad
 9. వ్యవసాయము సాగించుము. తప్పక లాభము కలుగును.
 10. వ్యాపారము చేయుట వలన లాభము ఉండును.
 
-
-### Extracted images (96):
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p10_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p11_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p12_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p13_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p14_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p15_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p16_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p17_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p18_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p19_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p1_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p20_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p21_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p22_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p23_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p24_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p25_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p26_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p27_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p28_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p29_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p2_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p30_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p31_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p32_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p33_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p34_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p35_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p36_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p37_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p38_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p39_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p3_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p40_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p41_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p42_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p43_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p44_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p45_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p46_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p47_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p48_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p49_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p4_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p50_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p51_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p5_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p6_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p7_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p8_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/img_p9_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_1.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_10.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_11.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_13.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_14.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_15.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_16.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_17.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_18.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_19.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_2.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_20.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_22.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_25.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_26.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_27.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_29.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_3.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_30.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_32.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_33.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_34.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_35.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_36.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_37.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_38.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_39.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_4.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_40.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_41.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_42.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_43.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_44.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_45.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_46.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_47.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_48.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_49.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_5.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_50.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_51.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_6.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_7.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_8.jpg`
-- `parsed-documents://20260616-164338-355187/Adobe_Scan_16_Jun_2026_1.pdf/images/page_9.jpg`
+# === END VERBATIM TELUGU OCR ===
