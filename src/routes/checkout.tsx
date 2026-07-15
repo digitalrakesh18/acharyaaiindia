@@ -128,19 +128,19 @@ function CheckoutPage() {
   const planDetails = {
     monthly: {
       name: "Premium Monthly",
-      price: "$9.99",
+      price: "₹499",
       period: "per month",
       description: "Unlimited palm scans and advanced readings",
     },
     yearly: {
       name: "Premium Yearly",
-      price: "$99.99",
+      price: "₹4,999",
       period: "per year",
       description: "Save 17% with annual billing",
     },
     "one-time": {
       name: "Premium Reading",
-      price: "$4.99",
+      price: "₹99",
       period: "one-time",
       description: "Single advanced reading with full analysis",
     },

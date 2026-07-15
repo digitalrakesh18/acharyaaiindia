@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
-import logoUrl from "@/assets/acharya-logo.svg";
+import logoAsset from "@/assets/acharya-logo.png.asset.json";
+const logoUrl = logoAsset.url;
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV_LINKS = [

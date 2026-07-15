@@ -156,9 +156,9 @@ function Landing() {
         <section className="grid grid-cols-12 gap-4 lg:grid-rows-6 lg:min-h-[820px]">
           {/* Primary Hero */}
           <div className="col-span-12 lg:col-span-8 lg:row-span-4 bg-card rounded-3xl border border-border p-6 sm:p-8 md:p-12 flex flex-col lg:justify-end relative overflow-hidden group lg:min-h-0">
-            {/* Desktop: cinematic full-bleed background, text sits over the fully-faded base */}
-            <PalmHologram className="hidden lg:block absolute inset-0 opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
-            <div className="hidden lg:block absolute inset-0 bg-gradient-to-t from-card via-card/85 to-card/20 pointer-events-none" />
+            {/* Desktop: palm anchored on the right side, text has its own readable panel on the left */}
+            <PalmHologram className="hidden lg:block absolute top-0 right-0 h-full w-1/2 opacity-95 rounded-l-none" />
+            <div className="hidden lg:block absolute inset-0 bg-gradient-to-r from-card via-card/95 to-transparent pointer-events-none" />
 
             {/* Mobile/tablet: contained image banner, text lives on solid card below for guaranteed contrast */}
             <PalmHologram className="lg:hidden mb-6 h-52 sm:h-64" />

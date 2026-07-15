@@ -40,7 +40,7 @@ export function Pricing() {
     {
       name: "Premium Monthly",
       description: "For the devoted seeker",
-      price: billingPeriod === "monthly" ? 9.99 : null,
+      price: billingPeriod === "monthly" ? 499 : null,
       period: "per month",
       badge: "Popular",
       features: [
@@ -60,12 +60,12 @@ export function Pricing() {
     {
       name: "Premium Yearly",
       description: "Best value for annual commitment",
-      price: billingPeriod === "yearly" ? 99.99 : null,
+      price: billingPeriod === "yearly" ? 4999 : null,
       period: "per year",
       badge: "Save 17%",
       features: [
         "Everything in Monthly",
-        "20% annual discount",
+        "2 months free",
         "Priority support",
         "Advanced analytics",
         "Export readings",
@@ -144,7 +144,7 @@ export function Pricing() {
                 <div>
                   {plan.price !== null ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">${plan.price}</span>
+                      <span className="text-4xl font-bold">₹{plan.price.toLocaleString("en-IN")}</span>
                       <span className="text-foreground/60">{plan.period}</span>
                     </div>
                   ) : (
@@ -184,15 +184,15 @@ export function Pricing() {
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-xl font-semibold mb-2">Just want one reading?</h3>
             <p className="text-foreground/70 mb-4">
-              Try a single premium palm reading with advanced analysis for just $4.99
+              Try a single premium palm reading with advanced analysis for just ₹99
             </p>
             <Button
               onClick={() => {
-                alert("One-time purchase coming soon! This will redirect to Stripe checkout.");
+                window.location.href = "/checkout?plan=one-time";
               }}
               className="bg-accent/20 hover:bg-accent/30"
             >
-              One-Time Reading - $4.99
+              One-Time Reading — ₹99
             </Button>
           </div>
         </div>
