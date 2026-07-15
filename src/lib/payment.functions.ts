@@ -72,7 +72,7 @@ export async function createPaymentIntent(params: {
   try {
     const intent = await stripe.paymentIntents.create({
       amount: params.amount,
-      currency: params.currency || "usd",
+      currency: params.currency || "inr",
       description: params.description,
       // Stripe expects `receipt_email` for sending receipts for PaymentIntents
       receipt_email: params.email,
