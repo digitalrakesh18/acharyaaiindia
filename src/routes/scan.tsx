@@ -379,7 +379,11 @@ function CaptureStep({
     try {
       const v = await scanFrame({ data: { imageDataUrl: dataUrl } });
       if (!v.isPalm) {
-        setError(v.reason || "That doesn't look like a clear palm. Please try again.");
+        setError(
+          "🖐️ Only a human palm can be scanned. " +
+            (v.reason ? v.reason + " " : "") +
+            "Please hold up your open palm and try again.",
+        );
         setPreview(null);
         setBusy(false);
         setStatus("");
