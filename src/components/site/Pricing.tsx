@@ -184,15 +184,15 @@ export function Pricing() {
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-xl font-semibold mb-2">Just want one reading?</h3>
             <p className="text-foreground/70 mb-4">
-              Try a single premium palm reading with advanced analysis for just $4.99
+              Try a single premium palm reading with advanced analysis for just ₹99
             </p>
             <Button
               onClick={() => {
-                alert("One-time purchase coming soon! This will redirect to Stripe checkout.");
+                window.location.href = "/checkout?plan=one-time";
               }}
               className="bg-accent/20 hover:bg-accent/30"
             >
-              One-Time Reading - $4.99
+              One-Time Reading — ₹99
             </Button>
           </div>
         </div>
