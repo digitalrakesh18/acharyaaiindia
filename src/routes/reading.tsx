@@ -87,6 +87,16 @@ function Reading() {
   const [storedAnnotations, setStoredAnnotations] = useState<Annotations | undefined>(undefined);
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
   const [focus, setFocus] = useState<string | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  useEffect(() => {
+    try {
+      setUnlocked(localStorage.getItem("hasta:unlocked") === "true");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     const h =
@@ -295,19 +305,84 @@ function Reading() {
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
                 The Full Shastra Reading
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif">Your complete destiny analysis</h2>
+              <h2 className="text-3xl md:text-4xl font-serif">
+                {unlocked ? "Your complete destiny analysis" : "The deeper reading awaits"}
+              </h2>
               <p className="text-xs text-foreground/50 uppercase tracking-widest font-mono">
-                Always free · Unlimited readings
+                {unlocked
+                  ? "Unlocked · Full access"
+                  : "Only a glimpse revealed — unlock the full Shastra below"}
               </p>
             </div>
-            {data.premium.map((p) => (
-              <article key={p.title} className="p-8 rounded-3xl border border-accent/20 bg-card/60">
-                <h2 className="font-serif text-2xl italic text-accent mb-4">{p.title}</h2>
-                <p className="text-lg leading-relaxed text-foreground/85 font-serif">{p.body}</p>
-              </article>
-            ))}
+            {data.premium.map((p, idx) => {
+              const isFirst = idx === 0;
+              const showFull = unlocked || isFirst;
+              const teaser = showFull
+                ? p.body
+                : p.body.split(" ").slice(0, 22).join(" ") + "…";
+              const locked = !unlocked && !isFirst;
+              return (
+                <article
+                  key={p.title}
+                  className="relative p-8 rounded-3xl border border-accent/20 bg-card/60 overflow-hidden"
+                >
+                  <h2 className="font-serif text-2xl italic text-accent mb-4">{p.title}</h2>
+                  <p
+                    className={
+                      "text-lg leading-relaxed text-foreground/85 font-serif " +
+                      (locked ? "blur-sm select-none" : "")
+                    }
+                  >
+                    {teaser}
+                  </p>
+                  {locked && (
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/70 to-card flex items-end justify-center p-6">
+                      <div className="text-center space-y-3">
+                        <div className="text-3xl">🔒</div>
+                        <p className="text-sm text-foreground/70 max-w-xs mx-auto">
+                          The Acharya has more to reveal about your{" "}
+                          <span className="text-accent font-semibold">
+                            {p.title.toLowerCase()}
+                          </span>
+                          . Unlock the complete reading.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+            {!unlocked && (
+              <div className="rounded-[32px] border border-accent/30 bg-gradient-to-br from-accent/10 via-card to-card p-8 md:p-10 text-center space-y-6 shadow-gold-sm">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+                    Unlock The Full Reading
+                  </span>
+                  <h3 className="mt-2 text-2xl md:text-3xl font-serif">
+                    Your palm has more to say. Don't stop here.
+                  </h3>
+                  <p className="mt-3 text-foreground/70 max-w-xl mx-auto text-sm md:text-base">
+                    Reveal your complete destiny map — career pivots, wealth cycles, marriage
+                    timing, karmic patterns, and unlimited chat with the Acharya.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPaywall(true)}
+                  className="bg-accent text-accent-foreground px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform shadow-gold"
+                >
+                  Unlock full reading →
+                </button>
+                <p className="text-[11px] text-foreground/50 uppercase tracking-widest font-mono">
+                  Starts at ₹49 · Secured by Stripe
+                </p>
+              </div>
+            )}
           </div>
         )}
+
+        {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
+
 
         <div className="text-center pt-8">
           <Link
@@ -575,6 +650,131 @@ function PalmCanvas({
     </section>
   );
 }
+
+/* ---------------- Paywall modal ---------------- */
+
+function PaywallModal({ onClose }: { onClose: () => void }) {
+  const plans = [
+    {
+      key: "one-time" as const,
+      name: "Full Reading",
+      price: "₹49",
+      period: "one-time",
+      tagline: "Unlock this palm's complete Shastra reading",
+      features: ["Full destiny analysis", "Career, wealth, love, karma", "Lifetime access to this reading"],
+      badge: null,
+      highlighted: false,
+    },
+    {
+      key: "monthly" as const,
+      name: "Premium Monthly",
+      price: "₹699",
+      period: "per month",
+      tagline: "Unlimited readings + unlimited Acharya chat",
+      features: [
+        "Unlimited palm scans",
+        "Unlimited chat with Acharya",
+        "All future readings unlocked",
+        "Priority processing",
+      ],
+      badge: "Most Popular",
+      highlighted: true,
+    },
+    {
+      key: "yearly" as const,
+      name: "Premium Yearly",
+      price: "₹5,999",
+      period: "per year",
+      tagline: "Everything in Monthly · Save 28%",
+      features: [
+        "Everything in Monthly",
+        "Save ₹2,389 vs monthly",
+        "Priority support",
+        "Early access to new features",
+      ],
+      badge: "Best Value",
+      highlighted: false,
+    },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-4xl bg-card border border-accent/30 rounded-3xl shadow-gold overflow-hidden my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-accent/10 to-transparent">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+              Unlock Full Reading
+            </div>
+            <div className="font-serif text-xl mt-1">Choose your path</div>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="text-foreground/60 hover:text-foreground text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4 p-6">
+          {plans.map((plan) => (
+            <div
+              key={plan.key}
+              className={
+                "relative rounded-2xl border p-6 flex flex-col " +
+                (plan.highlighted
+                  ? "border-accent bg-accent/5 shadow-divine-sm md:scale-105"
+                  : "border-border bg-background/50")
+              }
+            >
+              {plan.badge && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                  {plan.badge}
+                </span>
+              )}
+              <h3 className="font-serif text-xl">{plan.name}</h3>
+              <p className="text-xs text-foreground/60 mt-1">{plan.tagline}</p>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-3xl font-bold">{plan.price}</span>
+                <span className="text-sm text-foreground/60">{plan.period}</span>
+              </div>
+              <ul className="mt-4 space-y-2 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="text-accent mt-0.5">✧</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={`/checkout?plan=${plan.key}`}
+                className={
+                  "mt-5 block text-center py-3 rounded-full font-bold text-sm transition-all " +
+                  (plan.highlighted
+                    ? "bg-accent text-accent-foreground hover:scale-105 shadow-gold"
+                    : "bg-accent/15 text-foreground hover:bg-accent/25")
+                }
+              >
+                Continue →
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="px-6 pb-6 text-center text-[11px] text-foreground/50 uppercase tracking-widest font-mono">
+          Secure payments · Cancel anytime · 30-day money-back guarantee
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 /* ---------------- Q&A bot with the Acharya ---------------- */
 
