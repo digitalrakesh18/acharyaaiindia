@@ -680,23 +680,36 @@ async function callClaude(
   messages: unknown[],
   json: boolean,
   model = "claude-3-5-sonnet-20241022",
+  timeoutMs = 20000,
 ) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("LOCAL_FALLBACK: ANTHROPIC_API_KEY not configured");
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 2048,
-      messages,
-    }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: json ? 1200 : 2048,
+        messages,
+      }),
+    });
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error("Palm analysis timed out. Please try again with a clearer photo.");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const text = await res.text();
@@ -742,6 +755,7 @@ async function extractPalmAnnotations(
       ],
       true,
       model,
+      15000,
     );
 
     const content = json.choices?.[0]?.message?.content ?? "{}";
