@@ -26,9 +26,20 @@ export function getCORSHeaders(origin?: string): Record<string, string> {
 // ============================================================================
 
 export function getSecurityHeaders(): Record<string, string> {
+  // NOTE: Razorpay Checkout is hosted on checkout.razorpay.com and communicates
+  // back to api.razorpay.com + lumberjack.razorpay.com. If any of those are
+  // missing from CSP, the modal silently never opens in the browser (backend
+  // order creation via server SDK is not affected, but the buyer sees nothing).
   return {
     "Content-Security-Policy":
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.stripe.com; frame-src 'self'",
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com https://js.stripe.com https://static.cloudflareinsights.com; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: blob: https:; " +
+      "font-src 'self' data: https:; " +
+      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.razorpay.com https://lumberjack.razorpay.com https://checkout.razorpay.com https://*.razorpay.com https://api.anthropic.com; " +
+      "frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com https://*.razorpay.com https://js.stripe.com; " +
+      "form-action 'self' https://checkout.razorpay.com https://api.razorpay.com;",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "1; mode=block",
