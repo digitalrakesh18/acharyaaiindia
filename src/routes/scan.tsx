@@ -41,6 +41,24 @@ type Annotations = {
   signs: Array<{ name: string; x: number; y: number; meaning?: string }>;
 };
 
+const SCAN_TIMEOUT_MS = 18000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(message)), ms);
+    promise.then(
+      (value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        window.clearTimeout(timer);
+        reject(error);
+      },
+    );
+  });
+}
+
 function Stepper({ current }: { current: Step }) {
   const idx = STEPS.indexOf(current);
   return (
@@ -338,37 +356,64 @@ function CaptureStep({
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string>("");
+  const [cameraStarting, setCameraStarting] = useState(false);
 
   useEffect(() => {
     if (mode !== "camera") return;
     let stream: MediaStream | null = null;
+    let cancelled = false;
+    let cameraTimer: number | undefined;
     const video = videoRef.current;
     const start = async () => {
+      setCameraStarting(true);
+      setStreaming(false);
+      cameraTimer = window.setTimeout(() => {
+        if (!cancelled && !streaming) {
+          setError("Camera is taking too long. Use upload or allow camera permission and try again.");
+          setCameraStarting(false);
+        }
+      }, 9000);
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "environment", width: { ideal: 1280 } },
           audio: false,
         });
-        if (video) {
+        if (video && !cancelled) {
           video.srcObject = stream;
-          await video.play();
+          video.onloadedmetadata = () => {
+            if (!cancelled) {
+              setStreaming(true);
+              setCameraStarting(false);
+              setError(null);
+            }
+          };
+          await video.play().catch(() => undefined);
           setStreaming(true);
+          setCameraStarting(false);
           setError(null);
         }
       } catch (e: unknown) {
+        if (cancelled) return;
         setStreaming(false);
+        setCameraStarting(false);
         setError(e instanceof Error ? e.message : "Camera unavailable");
         setMode("upload");
+      } finally {
+        if (cameraTimer) window.clearTimeout(cameraTimer);
       }
     };
     start();
     return () => {
+      cancelled = true;
+      if (cameraTimer) window.clearTimeout(cameraTimer);
       if (video) {
         video.pause();
         video.srcObject = null;
+        video.onloadedmetadata = null;
       }
       stream?.getTracks().forEach((t) => t.stop());
       setStreaming(false);
+      setCameraStarting(false);
     };
   }, [mode]);
 
@@ -377,7 +422,11 @@ function CaptureStep({
     setError(null);
     setStatus("Verifying palm…");
     try {
-      const v = await scanFrame({ data: { imageDataUrl: dataUrl } });
+      const v = await withTimeout(
+        scanFrame({ data: { imageDataUrl: dataUrl } }),
+        SCAN_TIMEOUT_MS,
+        "Palm check is taking too long. Please retake in brighter light or upload a clear palm photo.",
+      );
       if (!v.isPalm) {
         setError(
           "🖐️ Only a human palm can be scanned. " +
@@ -400,6 +449,7 @@ function CaptureStep({
       onComplete();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not process the image");
+      setPreview(null);
       setBusy(false);
       setStatus("");
     }
@@ -408,6 +458,10 @@ function CaptureStep({
   const captureFromCamera = async () => {
     const video = videoRef.current;
     if (!video || !streaming) return;
+    if (!video.videoWidth || !video.videoHeight || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setError("Camera is not ready yet. Wait a second, or upload a clear palm photo.");
+      return;
+    }
     const canvas = document.createElement("canvas");
     const w = video.videoWidth;
     const h = video.videoHeight;
@@ -544,9 +598,14 @@ function CaptureStep({
                 Show your open palm
               </div>
 
-              {!streaming && (
+              {cameraStarting && !streaming && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/40">
-                  <div className="size-10 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
+                  <div className="flex flex-col items-center gap-3 rounded-2xl bg-background/80 px-5 py-4 backdrop-blur-sm">
+                    <div className="size-10 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-foreground/60">
+                      Opening camera
+                    </p>
+                  </div>
                 </div>
               )}
             </>
