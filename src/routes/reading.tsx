@@ -305,19 +305,84 @@ function Reading() {
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
                 The Full Shastra Reading
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif">Your complete destiny analysis</h2>
+              <h2 className="text-3xl md:text-4xl font-serif">
+                {unlocked ? "Your complete destiny analysis" : "The deeper reading awaits"}
+              </h2>
               <p className="text-xs text-foreground/50 uppercase tracking-widest font-mono">
-                Always free · Unlimited readings
+                {unlocked
+                  ? "Unlocked · Full access"
+                  : "Only a glimpse revealed — unlock the full Shastra below"}
               </p>
             </div>
-            {data.premium.map((p) => (
-              <article key={p.title} className="p-8 rounded-3xl border border-accent/20 bg-card/60">
-                <h2 className="font-serif text-2xl italic text-accent mb-4">{p.title}</h2>
-                <p className="text-lg leading-relaxed text-foreground/85 font-serif">{p.body}</p>
-              </article>
-            ))}
+            {data.premium.map((p, idx) => {
+              const isFirst = idx === 0;
+              const showFull = unlocked || isFirst;
+              const teaser = showFull
+                ? p.body
+                : p.body.split(" ").slice(0, 22).join(" ") + "…";
+              const locked = !unlocked && !isFirst;
+              return (
+                <article
+                  key={p.title}
+                  className="relative p-8 rounded-3xl border border-accent/20 bg-card/60 overflow-hidden"
+                >
+                  <h2 className="font-serif text-2xl italic text-accent mb-4">{p.title}</h2>
+                  <p
+                    className={
+                      "text-lg leading-relaxed text-foreground/85 font-serif " +
+                      (locked ? "blur-sm select-none" : "")
+                    }
+                  >
+                    {teaser}
+                  </p>
+                  {locked && (
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/70 to-card flex items-end justify-center p-6">
+                      <div className="text-center space-y-3">
+                        <div className="text-3xl">🔒</div>
+                        <p className="text-sm text-foreground/70 max-w-xs mx-auto">
+                          The Acharya has more to reveal about your{" "}
+                          <span className="text-accent font-semibold">
+                            {p.title.toLowerCase()}
+                          </span>
+                          . Unlock the complete reading.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+            {!unlocked && (
+              <div className="rounded-[32px] border border-accent/30 bg-gradient-to-br from-accent/10 via-card to-card p-8 md:p-10 text-center space-y-6 shadow-gold-sm">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+                    Unlock The Full Reading
+                  </span>
+                  <h3 className="mt-2 text-2xl md:text-3xl font-serif">
+                    Your palm has more to say. Don't stop here.
+                  </h3>
+                  <p className="mt-3 text-foreground/70 max-w-xl mx-auto text-sm md:text-base">
+                    Reveal your complete destiny map — career pivots, wealth cycles, marriage
+                    timing, karmic patterns, and unlimited chat with the Acharya.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPaywall(true)}
+                  className="bg-accent text-accent-foreground px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform shadow-gold"
+                >
+                  Unlock full reading →
+                </button>
+                <p className="text-[11px] text-foreground/50 uppercase tracking-widest font-mono">
+                  Starts at ₹49 · Secured by Stripe
+                </p>
+              </div>
+            )}
           </div>
         )}
+
+        {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
+
 
         <div className="text-center pt-8">
           <Link
