@@ -651,6 +651,131 @@ function PalmCanvas({
   );
 }
 
+/* ---------------- Paywall modal ---------------- */
+
+function PaywallModal({ onClose }: { onClose: () => void }) {
+  const plans = [
+    {
+      key: "one-time" as const,
+      name: "Full Reading",
+      price: "₹49",
+      period: "one-time",
+      tagline: "Unlock this palm's complete Shastra reading",
+      features: ["Full destiny analysis", "Career, wealth, love, karma", "Lifetime access to this reading"],
+      badge: null,
+      highlighted: false,
+    },
+    {
+      key: "monthly" as const,
+      name: "Premium Monthly",
+      price: "₹699",
+      period: "per month",
+      tagline: "Unlimited readings + unlimited Acharya chat",
+      features: [
+        "Unlimited palm scans",
+        "Unlimited chat with Acharya",
+        "All future readings unlocked",
+        "Priority processing",
+      ],
+      badge: "Most Popular",
+      highlighted: true,
+    },
+    {
+      key: "yearly" as const,
+      name: "Premium Yearly",
+      price: "₹5,999",
+      period: "per year",
+      tagline: "Everything in Monthly · Save 28%",
+      features: [
+        "Everything in Monthly",
+        "Save ₹2,389 vs monthly",
+        "Priority support",
+        "Early access to new features",
+      ],
+      badge: "Best Value",
+      highlighted: false,
+    },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-4xl bg-card border border-accent/30 rounded-3xl shadow-gold overflow-hidden my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-accent/10 to-transparent">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+              Unlock Full Reading
+            </div>
+            <div className="font-serif text-xl mt-1">Choose your path</div>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="text-foreground/60 hover:text-foreground text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4 p-6">
+          {plans.map((plan) => (
+            <div
+              key={plan.key}
+              className={
+                "relative rounded-2xl border p-6 flex flex-col " +
+                (plan.highlighted
+                  ? "border-accent bg-accent/5 shadow-divine-sm md:scale-105"
+                  : "border-border bg-background/50")
+              }
+            >
+              {plan.badge && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                  {plan.badge}
+                </span>
+              )}
+              <h3 className="font-serif text-xl">{plan.name}</h3>
+              <p className="text-xs text-foreground/60 mt-1">{plan.tagline}</p>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-3xl font-bold">{plan.price}</span>
+                <span className="text-sm text-foreground/60">{plan.period}</span>
+              </div>
+              <ul className="mt-4 space-y-2 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="text-accent mt-0.5">✧</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={`/checkout?plan=${plan.key}`}
+                className={
+                  "mt-5 block text-center py-3 rounded-full font-bold text-sm transition-all " +
+                  (plan.highlighted
+                    ? "bg-accent text-accent-foreground hover:scale-105 shadow-gold"
+                    : "bg-accent/15 text-foreground hover:bg-accent/25")
+                }
+              >
+                Continue →
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="px-6 pb-6 text-center text-[11px] text-foreground/50 uppercase tracking-widest font-mono">
+          Secure payments · Cancel anytime · 30-day money-back guarantee
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
 /* ---------------- Q&A bot with the Acharya ---------------- */
 
 type Msg = { role: "user" | "acharya"; text: string };
